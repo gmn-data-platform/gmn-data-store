@@ -5,7 +5,7 @@ Code for the database schema and GMN data ingestor.
 | Prerequisite                                                      | Description                                             |
 |-------------------------------------------------------------------|---------------------------------------------------------|
 | [Docker](https://www.docker.com/)                                 | Container management tool                               |
-| [Docker Compose V2](https://docs.docker.com/compose/cli-command/) | A tool for defining multi-container apps                |
+| [Docker Compose v2](https://docs.docker.com/compose/cli-command/) | A tool for defining multi-container apps                |
 | [GNU Make 4.1+](https://www.gnu.org/software/make/)               | A tool which allows an easy way to run project commands |
 
 ## Database Schema
