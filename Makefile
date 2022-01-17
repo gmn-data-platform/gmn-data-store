@@ -43,7 +43,7 @@ run_ingestor_tests:
 stop_ingestor_services:
 	echo "Stopping ingestor services"
 	cd gmn_data_ingestor
-	docker-compose down
+	docker compose down
 
 stop_and_clean_all_services:
 	echo "Stopping and cleaning all services"
