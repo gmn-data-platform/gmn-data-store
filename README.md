@@ -8,6 +8,8 @@ Code for the database schema and GMN data ingestor.
 | [Docker Compose v2](https://docs.docker.com/compose/cli-command/) | A tool for defining multi-container apps                |
 | [GNU Make 4.1+](https://www.gnu.org/software/make/)               | A tool which allows an easy way to run project commands |
 
+Refer to the [gmn-data-platform](https://github.com/gmn-data-platform/gmn-data-platform) repository for optional PyCharm setup.
+
 ## Database Schema
 ...
 
@@ -46,16 +48,7 @@ See the [makefile](Makefile) for more commands.
 
 ---
 
-## PyCharm setup steps
-- Load the master gmn-data-platform repository into PyCharm and run the setup instructions in the README.
-- Use the `.run` directory for run configurations for this project.
-- Set docker-compose path in PyCharm to be `~/.local/bin/docker-compose-v2` where the file is executable and contains:
-```sh
-#!/bin/bash
-docker compose "$@"
-```
-- Enable "Use Docker Compose v2 beta".
-- For debugging use the pycharm remote debugger (todo)
+
 
 ## Relevant links
 https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html
