@@ -1,5 +1,5 @@
 # GMN Data Store
-Code for the database schema and GMN data ingestor.
+Global Meteor Network database schema and data ingestion
 
 ## Requirements
 | Prerequisite                                                      | Description                                             |
