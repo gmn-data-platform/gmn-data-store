@@ -1,5 +1,5 @@
 # GMN Data Store
-Global Meteor Network database schema and data ingestion
+Global Meteor Network database schema and data ingestion.
 
 ## Requirements
 | Prerequisite                                                      | Description                                             |
@@ -7,8 +7,6 @@ Global Meteor Network database schema and data ingestion
 | [Docker](https://www.docker.com/)                                 | Container management tool                               |
 | [Docker Compose v2](https://docs.docker.com/compose/cli-command/) | A tool for defining multi-container apps                |
 | [GNU Make 4.1+](https://www.gnu.org/software/make/)               | A tool which allows an easy way to run project commands |
-
-Refer to the [gmn-data-platform](https://github.com/gmn-data-platform/gmn-data-platform) repository for optional PyCharm setup.
 
 ## Database Schema
 ...
@@ -48,7 +46,17 @@ See the [makefile](Makefile) for more commands.
 
 ---
 
-
+## PyCharm setup steps (optional)
+- Use the `.run` directory for run configurations for this project. These settings should be loaded automatically.
+- Set docker-compose path in PyCharm to be `~/.local/bin/docker-compose-v2` where the file is executable and contains:
+```sh
+#!/bin/bash
+docker compose "$@"
+```
+- Enable "Use Docker Compose v2 beta".
+- Setup Python interpreter using Docker Compose.
+- For debugging use the pycharm remote debugger (todo).
+- Recommended non-bundled plugins: [Big Data Tools](https://plugins.jetbrains.com/plugin/12494-big-data-tools), [Makefile Language](https://plugins.jetbrains.com/plugin/9333-makefile-language), [.env files support](https://plugins.jetbrains.com/plugin/9525--env-files-support), [CSV](https://github.com/SeeSharpSoft/intellij-csv-validator)
 
 ## Relevant links
 https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html
