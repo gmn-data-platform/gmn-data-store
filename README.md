@@ -13,6 +13,18 @@ Global Meteor Network database schema and data ingestion.
 
 ## GMN Data Ingestor
 
+### Setup environment variables with .env
+Setup environment files:
+```sh
+# Linux/Mac
+cp database/.env.default database/.env
+
+# Or Windows
+copy database/.env.default database/.env
+```
+
+Then input environment variables in `.env`  to match your own system/configuration.
+
 ### Running using Docker Compose
 ```sh
 make init_ingestor_services
