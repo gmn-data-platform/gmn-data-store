@@ -2,9 +2,9 @@
 SHELL=/bin/bash
 
 init_services: init_database_services init_ingestor_services
-run_services: run_database_services run_ingestor_services
+run_services: run_all_services
 run_tests: run_database_tests run_ingestor_tests
-stop_services: stop_database_services stop_ingestor_services
+stop_services: stop_all_services
 
 
 init_database_services:
@@ -43,13 +43,21 @@ run_all_services:
 	echo "Running all services"
 	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up -d
 
-stop_ingestor_services:
+view_all_logs:
+	echo "Viewing all logs"
+	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor logs -f
+
+stop_all_services:
 	echo "Stopping ingestor services"
-	docker-compose down
+	docker-compose down --remove-orphans
 
 stop_and_clean_all_services:
 	echo "Stopping and cleaning all services"
 	docker-compose down -v --rmi all
+
+restart_all_services:
+	echo "Restarting all services"
+	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor restart
 
 generate_avro_schema:
 	# TODO move avro init to gmn-python-api
