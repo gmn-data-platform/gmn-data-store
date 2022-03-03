@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="test_run_main_dag" type="PythonConfigurationType" factoryName="Python">
-    <module name="gmn-data-platform" />
+    <module name="gmn-data-store" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>

@@ -1,0 +1,601 @@
+{
+    "type": "record",
+    "name": "Root",
+    "fields": [
+        {
+            "name": "Beginning (Julian date)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Beginning (UTC Time)",
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        {
+            "name": "IAU (No)",
+            "type": [
+                "null",
+                "long"
+            ]
+        },
+        {
+            "name": "IAU (code)",
+            "type": [
+                "null",
+                "string"
+            ]
+        },
+        {
+            "name": "Sol lon (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "App LST (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "RAgeo (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "DECgeo (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.1)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "LAMgeo (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.2)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "BETgeo (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.3)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Vgeo (km/s)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.4)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "LAMhel (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.5)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "BEThel (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.6)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Vhel (km/s)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.7)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "a (AU)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.8)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "e",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.9)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "i (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.10)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "peri (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.11)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "node (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.12)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Pi (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.13)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "b (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.14)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "q (AU)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.15)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "f (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.16)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "M (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.17)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Q (AU)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.18)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "n (deg/day)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.19)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "T (years)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.20)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "TisserandJ",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.21)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "RAapp (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.22)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "DECapp (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.23)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Azim +E (of N deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.24)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Elev (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.25)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Vinit (km/s)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.26)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Vavg (km/s)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.27)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "LatBeg (+N deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.28)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "LonBeg (+E deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.29)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "HtBeg (km)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.30)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "LatEnd (+N deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.31)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "LonEnd (+E deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.32)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "HtEnd (km)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "+/- (sigma.33)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Duration (sec)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Peak (AbsMag)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Peak Ht (km)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "F (param)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Mass kg (tau=0.7%)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Qc (deg)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "MedianFitErr (arcsec)",
+            "type": [
+                "null",
+                "double"
+            ]
+        },
+        {
+            "name": "Beg in (FOV)",
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        {
+            "name": "End in (FOV)",
+            "type": [
+                "null",
+                "boolean"
+            ]
+        },
+        {
+            "name": "Num (stat)",
+            "type": [
+                "null",
+                "long"
+            ]
+        },
+        {
+            "name": "Participating (stations)",
+            "type": [
+                "null",
+                "string"
+            ]
+        }
+    ]
+}

@@ -19,14 +19,12 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- }
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pytest==6.2.5 kafka-python==2.0.2 gmn-python-api==0.0.1 kafka-python==2.0.2 fastavro==1.4.9 pandavro==1.6.0 numpy>1.20.3}
     PYTHONPATH: "/home/airflow/.local/lib/python3.7/site-packages"
   volumes:
-    - ./dags:/opt/airflow/dags
-    - ./logs:/opt/airflow/logs
-    - ./plugins:/opt/airflow/plugins
-    - ./tests:/opt/airflow/tests
-    - ./extracted:/home/airflow/extracted
+    - ./gmn_data_ingestor/:/opt/airflow/dags
+    - ./gmn_data_ingestor/airflow_logs:/opt/airflow/logs
+    - ./gmn_data_ingestor/extracted:/home/airflow/extracted
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -34,9 +32,34 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
+    ksqldb-init:
+      condition: service_started
 
 services:
   # Kafka --------------------------------------------------------------------------------------------------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.2.0
+    container_name: zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME:
+        2000
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.0.1
+    hostname: schema-registry
+    container_name: schema-registry
+    restart: always
+    depends_on:
+    - zookeeper
+    - kafka-broker
+    ports:
+    - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka-broker:29092'
+
   kafka-broker:
     image: confluentinc/cp-kafka:6.2.0
     container_name: kafka-broker
@@ -54,15 +77,9 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka-broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
-    container_name: zookeeper
-    restart: always
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
 
   kafka-init:
     image: confluentinc/cp-kafka:6.2.0
@@ -70,9 +87,82 @@ services:
       - kafka-broker
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
               cub kafka-ready -b kafka-broker:29092 1 30 && \
-              kafka-topics --create --topic extracted --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
+              kafka-topics --create --topic extracted --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic extracted_failed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic transformed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic transformed_failed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic loaded --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic loaded_failed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
 
-  # CockroachDB --------------------------------------------------------------------------------------------------------
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:0.23.1
+    hostname: ksqldb-server
+    container_name: ksqldb-server
+    depends_on:
+      - zookeeper
+      - kafka-broker
+      - schema-registry
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_BOOTSTRAP_SERVERS: kafka-broker:29092
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+
+  ksqldb-init:
+    image: confluentinc/ksqldb-server:0.23.1
+    container_name: ksql-init
+    depends_on:
+      - kafka-init
+      - ksqldb-server
+      - schema-registry
+    volumes:
+      - ./gmn_data_ingestor/ksql_scripts/:/data/scripts/
+      - ./gmn_data_ingestor/avro/:/avro/
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        echo -e "\n\n Waiting for KSQL to be available before launching CLI\n"
+        while [ $$(curl -s -o /dev/null -w %{http_code} http://ksqldb-server:8088/) -eq 000 ]
+        do
+          echo -e $$(date) "KSQL Server HTTP state: " $$(curl -s -o /dev/null -w %{http_code} http://ksqldb-server:8088/) " (waiting for 200)"
+          sleep 5
+        done
+        echo -e "\n\n-> Running KSQL commands\n"
+        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/extracted-value/versions
+        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/extracted_failed-value/versions
+        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/transformed-value/versions
+        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/transformed_failed-value/versions
+        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/loaded-value/versions
+        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/loaded_failed-value/versions 
+        cat /data/scripts/ksql-init.sql <(echo 'EXIT')| ksql http://ksqldb-server:8088/
+        echo -e "\n\n-> Sleeping…\n"
+        sleep infinity
+
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:0.23.1
+    container_name: ksqldb-cli
+    depends_on:
+      - kafka-broker
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+
+  # Postgres --------------------------------------------------------------------------------------------------------
+
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+#    volumes:
+#      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
   # Airflow ------------------------------------------------------------------------------------------------------------
   postgres:
@@ -228,8 +318,8 @@ services:
           echo "   https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html#before-you-begin"
           echo
         fi
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        mkdir -p /sources/logs
+        chown -R "${AIRFLOW_UID}:0" /sources/logs
         exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
@@ -240,7 +330,7 @@ services:
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
     user: "0:0"
     volumes:
-      - .:/sources
+      - ./gmn_data_ingestor:/sources
 
   airflow-cli:
     <<: *airflow-common
