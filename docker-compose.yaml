@@ -152,17 +152,26 @@ services:
     tty: true
 
   # Postgres --------------------------------------------------------------------------------------------------------
-
   db:
     image: postgres
+    restart: always
     ports:
       - "5432:5432"
-#    volumes:
-#      - ./data/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - gmn_data_store-postgres-db-volume:/var/lib/postgresql/data
+    env_file:
+      - ./database/.env
+
+  db-init:
+    image: python:3.7.12
+    depends_on:
+      - db
+    entrypoint: /bin/sh
+    tty: true
+    command: -c "python -m pip install -r /database/requirements.txt && python /database/setup_database.py"
+    volumes:
+      - ./database:/database
+
 
   # Airflow ------------------------------------------------------------------------------------------------------------
   postgres:
@@ -172,7 +181,7 @@ services:
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
     volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
+      - airflow-postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "airflow" ]
       interval: 5s
@@ -362,4 +371,5 @@ services:
         condition: service_completed_successfully
 
 volumes:
-  postgres-db-volume:
+  airflow-postgres-db-volume:
+  gmn_data_store-postgres-db-volume:
