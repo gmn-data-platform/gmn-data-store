@@ -30,6 +30,3 @@ if __name__ == '__main__':
     engine = create_engine(f'{db_uri}/{os.getenv("POSTGRES_DATABASE")}')
     Base.metadata.create_all(engine)
     print("Created tables")
-
-    # seed_data()
-    # print("Populated with initial data")
