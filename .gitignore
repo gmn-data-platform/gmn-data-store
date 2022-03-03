@@ -1,7 +1,9 @@
-logs/
+*logs*/
 __pycache__/
 
 .env
 
 # Ignore IDE files
 .idea/*
+
+/gmn_data_ingestor/avro/trajectory_summary_schema.avro
