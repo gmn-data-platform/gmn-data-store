@@ -7,3 +7,4 @@ __pycache__/
 .idea/*
 
 /gmn_data_ingestor/avro/trajectory_summary_schema.avro
+/gmn_data_ingestor/extracted_data/

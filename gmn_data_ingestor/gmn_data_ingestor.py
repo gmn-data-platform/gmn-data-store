@@ -18,8 +18,6 @@ from gmn_python_api.trajectory_summary_reader import \
     read_trajectory_summary_as_dataframe, DATETIME_FORMAT
 
 EXTRACTED_DATA_DIRECTORY = '~/extracted_data'
-# AVRO_SCHEMA_PATH = f"{os.path.dirname(__file__)}/avro/trajectory_summary_schema.avsc"
-# AVRO_SCHEMA = avro_parse(open(AVRO_SCHEMA_PATH).read())
 
 def save_extracted_data_file(extracted_data_directory: str, target_date: datetime,
                              logical_date: datetime,
@@ -28,16 +26,14 @@ def save_extracted_data_file(extracted_data_directory: str, target_date: datetim
         os.path.expanduser(extracted_data_directory),
         execution_date.strftime('%Y%m%d'))
     os.makedirs(execution_date_extracted_data_directory, exist_ok=True)
-    filename = f"target_{target_date}_logical_{logical_date}_execution_{execution_date}.txt" + ".{}"
+    filename = f"target_{target_date}_logical_{logical_date}" \
+               f"_execution_{execution_date}.log"
     file_path = os.path.join(execution_date_extracted_data_directory, filename)
-    counter = 0
-    while os.path.isfile(file_path.format(counter)):
-        counter += 1
-    file = open(file_path.format(counter), "w")
+    file = open(file_path, "w")
     file.write(file_content)
     file.close()
 
-    return file_path.format(counter)
+    return file_path
 
 
 def gmn_data_to_kafka(day_offset: int = 0):
@@ -45,7 +41,8 @@ def gmn_data_to_kafka(day_offset: int = 0):
     context = get_current_context()
     target_date = context['logical_date'] + timedelta(days=day_offset)
     print(
-        f"Extracting data from {target_date} in dag run with logical date {context['logical_date']} "
+        f"Extracting data from {target_date} in dag run with logical date "
+        f"{context['logical_date']} "
         f"on current execution date {context['execution_date']}")
 
     # Find target_date filename by looking at the directory listing
@@ -63,14 +60,14 @@ def gmn_data_to_kafka(day_offset: int = 0):
     print("First 5 rows of the DataFrame: ")
     print(trajectory_df.info())
 
-    # convert all datetime64[ns] to long, where the long stores the number of microseconds from the unix epoch, 1 January 1970 00:00:00.000000 UTC
-    # trajectory_df[""] = (stamps - pd.Timestamp("1970-01-01")) // pd.Timedelta('1ms')
-    trajectory_df['Beginning (UTC Time)'] = trajectory_df['Beginning (UTC Time)'].dt.strftime(DATETIME_FORMAT)
-    # trajectory_df = trajectory_df.replace({np.nan:None})
+    trajectory_df['Beginning (UTC Time)'] = trajectory_df[
+        'Beginning (UTC Time)'].dt.strftime(DATETIME_FORMAT)
     trajectory_df['IAU (code)'] = trajectory_df['IAU (code)'].astype('unicode')
-    trajectory_df['Participating (stations)'] = trajectory_df['Participating (stations)'].astype('unicode')
+    trajectory_df['Participating (stations)'] = trajectory_df[
+        'Participating (stations)'].astype('unicode')
 
-    producer = KafkaProducer(bootstrap_servers='kafka-broker:29092', value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+    producer = KafkaProducer(bootstrap_servers='kafka-broker:29092',
+                             value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
     buf = io.BytesIO()
     pdx.to_avro(buf, trajectory_df)
@@ -80,17 +77,11 @@ def gmn_data_to_kafka(day_offset: int = 0):
     index = 0
     for record in avro_reader:
         msg = producer.send('extracted', value=record)
-        print(f"Sent sighting row to kafka of index={index} to partition={msg.get().partition}, offset={msg.get().offset}, topic={msg.get().topic}")
+        print(
+            f"Sent sighting row to kafka of index={index} to "
+            f"partition={msg.get().partition}, offset={msg.get().offset},"
+            f" topic={msg.get().topic}")
         index += 1
-
-        # print(row.to_dict())
-        # writer = DatumWriter(AVRO_SCHEMA)
-        # bytes_writer = io.BytesIO()
-        # encoder = BinaryEncoder(bytes_writer)
-        # writer.write(row.to_dict(), encoder)
-        # raw_bytes = bytes_writer.getvalue()
-        # producer.send('extracted', raw_bytes)
-        # print(f"Sent row {index} to kafka")
 
     producer.flush()
     buf.close()
@@ -124,9 +115,13 @@ def gmn_data_ingestor_historical_extract_dag():
         op_kwargs={})
 
 
-globals()['gmn_data_ingestor_daily_extract_dag'] = gmn_data_ingestor_daily_extract_dag()
 globals()[
-    'gmn_data_ingestor_historical_extract_dag'] = gmn_data_ingestor_historical_extract_dag()
+    'gmn_data_ingestor_daily_extract_dag'
+] = gmn_data_ingestor_daily_extract_dag()
+
+globals()[
+    'gmn_data_ingestor_historical_extract_dag'
+] = gmn_data_ingestor_historical_extract_dag()
 
 # https://airflow.apache.org/docs/apache-airflow/stable/executor/debug.html
 if __name__ == "__main__":

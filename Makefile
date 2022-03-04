@@ -5,7 +5,7 @@ init_services: init_database_services init_ingestor_services
 run_services: run_all_services
 run_tests: run_database_tests run_ingestor_tests
 stop_services: stop_all_services
-
+stop_and_clean_services: stop_and_clean_all_services
 
 init_database_services:
 	echo "Initializing database services"
@@ -49,11 +49,11 @@ view_all_logs:
 
 stop_all_services:
 	echo "Stopping ingestor services"
-	docker-compose down --remove-orphans
+	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor down --remove-orphans
 
 stop_and_clean_all_services:
 	echo "Stopping and cleaning all services"
-	docker-compose down -v --rmi all
+	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor down -v --rmi all
 
 restart_all_services:
 	echo "Restarting all services"

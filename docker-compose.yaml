@@ -24,7 +24,7 @@ x-airflow-common:
   volumes:
     - ./gmn_data_ingestor/:/opt/airflow/dags
     - ./gmn_data_ingestor/airflow_logs:/opt/airflow/logs
-    - ./gmn_data_ingestor/extracted:/home/airflow/extracted
+    - ./gmn_data_ingestor/extracted_data:/home/airflow/extracted_data
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -36,7 +36,7 @@ x-airflow-common:
       condition: service_started
 
 services:
-  # Kafka --------------------------------------------------------------------------------------------------------------
+  # Kafka ------------------------------------------------------------------------------
   zookeeper:
     image: confluentinc/cp-zookeeper:6.2.0
     container_name: zookeeper
@@ -69,6 +69,7 @@ services:
       # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
       - "9092:9092"
     depends_on:
+      - db
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
@@ -151,7 +152,7 @@ services:
     entrypoint: /bin/sh
     tty: true
 
-  # Postgres --------------------------------------------------------------------------------------------------------
+  # Postgres ---------------------------------------------------------------------------
   db:
     image: postgres
     restart: always
@@ -173,7 +174,7 @@ services:
       - ./database:/database
 
 
-  # Airflow ------------------------------------------------------------------------------------------------------------
+  # Airflow ----------------------------------------------------------------------------
   postgres:
     image: postgres:13
     environment:
@@ -327,8 +328,10 @@ services:
           echo "   https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html#before-you-begin"
           echo
         fi
-        mkdir -p /sources/logs
-        chown -R "${AIRFLOW_UID}:0" /sources/logs
+        mkdir -p /sources/airflow_logs
+        chown -R "${AIRFLOW_UID}:0" /sources/airflow_logs
+        chown -R "${AIRFLOW_UID}:0" /source/extracted_data
+        chmod 777 /sources/extracted_data
         exec /entrypoint airflow version
     # yamllint enable rule:line-length
     environment:
@@ -370,6 +373,7 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+# Volumes ------------------------------------------------------------------------------
 volumes:
   airflow-postgres-db-volume:
   gmn_data_store-postgres-db-volume:
