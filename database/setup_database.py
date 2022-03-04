@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy_utils import database_exists, create_database
 
-from . import DB_URI, get_engine
+from __init__ import DB_URI, get_engine
 from database_schema import Base
 
 load_dotenv("/database/.env")

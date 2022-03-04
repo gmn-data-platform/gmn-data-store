@@ -6,7 +6,7 @@ import sys
 from dotenv import load_dotenv
 from sqlalchemy_utils import drop_database
 
-from . import get_engine, DB_URI
+from __init__ import get_engine, DB_URI
 
 load_dotenv("/database/.env")
 
