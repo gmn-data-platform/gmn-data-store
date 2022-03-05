@@ -15,6 +15,14 @@ def main():
     df['IAU (code)'] = df['IAU (code)'].astype('unicode')
     df['Participating (stations)'] = df['Participating (stations)'].astype('unicode')
 
+    df.columns = df.columns.str.replace('[^0-9a-zA-Z]+', '_')
+    df.columns = df.columns.str.rstrip('_')
+    df.columns = df.columns.str.lstrip('_')
+    df.columns = df.columns.str.replace('Q_AU', 'q_au_')
+    df.columns = df.columns.str.lower()
+
+    print(df.info())
+
     pdx.to_avro(AVRO_PATH, df)
     saved = pdx.read_avro(AVRO_PATH)
     print(saved)

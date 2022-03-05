@@ -32,7 +32,7 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
-    ksqldb-init:
+    ksqldb-init-2:
       condition: service_started
 
 services:
@@ -112,16 +112,46 @@ services:
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
 
-  ksqldb-init:
-    image: confluentinc/ksqldb-server:0.23.1
-    container_name: ksql-init
+  ksqldb-init-1:
+    image: alpine:3.7
+    container_name: ksqldb-init-1
     depends_on:
+      - kafka-broker
       - kafka-init
       - ksqldb-server
       - schema-registry
     volumes:
-      - ./gmn_data_ingestor/ksql_scripts/:/data/scripts/
       - ./gmn_data_ingestor/avro/:/avro/
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        apk update && apk add curl jq && rm -rf /var/cache/apk/*
+        export SCHEMA=$$(jq tostring /avro/trajectory_summary_schema.avsc)
+        echo "{\"schema\":$$SCHEMA}"
+        echo -e "\n\n Waiting for http://schema-registry:8081 to be available before launching CLI\n"
+        while [ $$(curl -s -o /dev/null -w %{http_code} http://schema-registry:8081) -eq 000 ]
+        do
+          echo -e $$(date) "schema-registry Server HTTP state: " $$(curl -s -o /dev/null -w %{http_code} http://schema-registry:8081) " (waiting for 200)"
+          sleep 5
+        done
+        sleep 10
+        curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$SCHEMA}" http://schema-registry:8081/subjects/extracted-value/versions
+        curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$SCHEMA}" http://schema-registry:8081/subjects/extracted_failed-value/versions
+        curl -X GET http://schema-registry:8081/subjects
+        curl -X GET http://schema-registry:8081/subjects/extracted-value/versions
+
+  ksqldb-init-2:
+    image: confluentinc/ksqldb-server:0.23.1
+    container_name: ksqldb-init-2
+    depends_on:
+      - kafka-broker
+      - kafka-init
+      - ksqldb-server
+      - schema-registry
+      - ksqldb-init-1
+    volumes:
+      - ./gmn_data_ingestor/ksql_scripts/:/data/scripts/
     entrypoint:
       - /bin/bash
       - -c
@@ -132,13 +162,8 @@ services:
           echo -e $$(date) "KSQL Server HTTP state: " $$(curl -s -o /dev/null -w %{http_code} http://ksqldb-server:8088/) " (waiting for 200)"
           sleep 5
         done
+        sleep 60
         echo -e "\n\n-> Running KSQL commands\n"
-        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/extracted-value/versions
-        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/extracted_failed-value/versions
-        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/transformed-value/versions
-        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/transformed_failed-value/versions
-        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/loaded-value/versions
-        curl -X POST -H "Content-Type: application/vnd.schemaregistry.v1+json" --data '$$(</avro/trajectory_summary_schema.avsc)' http://schema-registry:8081/subjects/loaded_failed-value/versions 
         cat /data/scripts/ksql-init.sql <(echo 'EXIT')| ksql http://ksqldb-server:8088/
         echo -e "\n\n-> Sleeping…\n"
         sleep infinity

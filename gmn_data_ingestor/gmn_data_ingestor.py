@@ -62,9 +62,16 @@ def gmn_data_to_kafka(day_offset: int = 0):
 
     trajectory_df['Beginning (UTC Time)'] = trajectory_df[
         'Beginning (UTC Time)'].dt.strftime(DATETIME_FORMAT)
+
     trajectory_df['IAU (code)'] = trajectory_df['IAU (code)'].astype('unicode')
     trajectory_df['Participating (stations)'] = trajectory_df[
         'Participating (stations)'].astype('unicode')
+
+    trajectory_df.columns = trajectory_df.columns.str.replace('[^0-9a-zA-Z]+', '_')
+    trajectory_df.columns = trajectory_df.columns.str.rstrip('_')
+    trajectory_df.columns = trajectory_df.columns.str.lstrip('_')
+    trajectory_df.columns = trajectory_df.columns.str.replace('Q_AU', 'q_au_')
+    trajectory_df.columns = trajectory_df.columns.str.lower()
 
     producer = KafkaProducer(bootstrap_servers='kafka-broker:29092',
                              value_serializer=lambda v: json.dumps(v).encode('utf-8'))

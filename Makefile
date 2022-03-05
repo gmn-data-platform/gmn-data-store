@@ -26,9 +26,9 @@ init_ingestor_services:
 	echo "Initializing ingestor services"
 	cd gmn_data_ingestor
 	echo -e "AIRFLOW_UID=$(shell id -u)" > .env
-	cd ../
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up --abort-on-container-exit kafka-init
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up --abort-on-container-exit airflow-init
+	#cd ../
+#	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up --abort-on-container-exit kafka-init
+#	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up --abort-on-container-exit airflow-init
 	# docker-compose -p gmn_data_ingestor up ksqldb-init
 
 test_run_main_dag:
