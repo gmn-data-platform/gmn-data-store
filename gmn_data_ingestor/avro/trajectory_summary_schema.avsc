@@ -13,10 +13,7 @@
       "name": "beginning_utc_time",
       "type": [
         "null",
-        {
-          "type": "long",
-          "logicalType": "timestamp-micros"
-        }
+        "string"
       ]
     },
     {

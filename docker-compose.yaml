@@ -19,7 +19,7 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pytest==6.2.5 kafka-python==2.0.2 gmn-python-api==0.0.1 kafka-python==2.0.2 fastavro==1.4.9 pandavro==1.6.0 numpy>1.20.3}
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pytest==6.2.5 confluent-kafka==1.8.2 kafka-python==2.0.2 gmn-python-api==0.0.1 kafka-python==2.0.2 fastavro==1.4.9 pandavro==1.6.0 avro==1.11.0 numpy>1.20.3}
     PYTHONPATH: "/home/airflow/.local/lib/python3.7/site-packages"
   volumes:
     - ./gmn_data_ingestor/:/opt/airflow/dags
@@ -45,6 +45,8 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME:
         2000
+    networks:
+      - gmn_data_platform_network
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.0.1
@@ -52,13 +54,15 @@ services:
     container_name: schema-registry
     restart: always
     depends_on:
-    - zookeeper
-    - kafka-broker
+      - zookeeper
+      - kafka-broker
     ports:
-    - "8081:8081"
+      - "8081:8081"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka-broker:29092'
+    networks:
+      - gmn_data_platform_network
 
   kafka-broker:
     image: confluentinc/cp-kafka:6.2.0
@@ -81,6 +85,8 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+    networks:
+      - gmn_data_platform_network
 
   kafka-init:
     image: confluentinc/cp-kafka:6.2.0
@@ -94,6 +100,8 @@ services:
               kafka-topics --create --topic transformed_failed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
               kafka-topics --create --topic loaded --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
               kafka-topics --create --topic loaded_failed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
+    networks:
+      - gmn_data_platform_network
 
   ksqldb-server:
     image: confluentinc/ksqldb-server:0.23.1
@@ -111,6 +119,17 @@ services:
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+#      KSQL_KSQL_PERSISTENCE_DEFAULT_FORMAT_KEY: AVRO
+#      KSQL_KSQL_PERSISTENCE_DEFAULT_FORMAT_VALUE: AVRO
+      KSQL_CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      KSQL_CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      KSQL_CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      KSQL_CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+#      KSQL_CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "true"
+#      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+#      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+    networks:
+      - gmn_data_platform_network
 
   ksqldb-init-1:
     image: alpine:3.7
@@ -137,9 +156,11 @@ services:
         done
         sleep 10
         curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$SCHEMA}" http://schema-registry:8081/subjects/extracted-value/versions
-        curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$SCHEMA}" http://schema-registry:8081/subjects/extracted_failed-value/versions
+        # curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$SCHEMA}" http://schema-registry:8081/subjects/extracted_failed-value/versions
         curl -X GET http://schema-registry:8081/subjects
         curl -X GET http://schema-registry:8081/subjects/extracted-value/versions
+    networks:
+      - gmn_data_platform_network
 
   ksqldb-init-2:
     image: confluentinc/ksqldb-server:0.23.1
@@ -167,6 +188,8 @@ services:
         cat /data/scripts/ksql-init.sql <(echo 'EXIT')| ksql http://ksqldb-server:8088/
         echo -e "\n\n-> Sleeping…\n"
         sleep infinity
+    networks:
+      - gmn_data_platform_network
 
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.23.1
@@ -176,6 +199,8 @@ services:
       - ksqldb-server
     entrypoint: /bin/sh
     tty: true
+    networks:
+      - gmn_data_platform_network
 
   # Postgres ---------------------------------------------------------------------------
   db:
@@ -187,6 +212,8 @@ services:
       - gmn_data_store-postgres-db-volume:/var/lib/postgresql/data
     env_file:
       - ./database/.env
+    networks:
+      - gmn_data_platform_network
 
   db-init:
     image: python:3.7.12
@@ -197,6 +224,8 @@ services:
     command: -c "python -m pip install -r /database/requirements.txt && python /database/setup_database.py"
     volumes:
       - ./database:/database
+    networks:
+      - gmn_data_platform_network
 
 
   # Airflow ----------------------------------------------------------------------------
@@ -213,6 +242,8 @@ services:
       interval: 5s
       retries: 5
     restart: always
+    networks:
+      - gmn_data_platform_network
 
   redis:
     image: redis:5.0.3-alpine
@@ -224,6 +255,8 @@ services:
       timeout: 30s
       retries: 50
     restart: always
+    networks:
+      - gmn_data_platform_network
 
   airflow-webserver:
     <<: *airflow-common
@@ -240,6 +273,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - gmn_data_platform_network
 
   airflow-scheduler:
     <<: *airflow-common
@@ -254,6 +289,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - gmn_data_platform_network
 
   airflow-worker:
     <<: *airflow-common
@@ -275,6 +312,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - gmn_data_platform_network
 
   airflow-triggerer:
     <<: *airflow-common
@@ -289,6 +328,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - gmn_data_platform_network
 
   airflow-init:
     <<: *airflow-common
@@ -368,6 +409,8 @@ services:
     user: "0:0"
     volumes:
       - ./gmn_data_ingestor:/sources
+    networks:
+      - gmn_data_platform_network
 
   airflow-cli:
     <<: *airflow-common
@@ -397,8 +440,15 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - gmn_data_platform_network
 
 # Volumes ------------------------------------------------------------------------------
 volumes:
   airflow-postgres-db-volume:
   gmn_data_store-postgres-db-volume:
+
+# Networks -----------------------------------------------------------------------------
+networks:
+  gmn_data_platform_network:
+    name: gmn_data_platform_network
