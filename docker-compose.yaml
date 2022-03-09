@@ -119,15 +119,15 @@ services:
       KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
       KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
-#      KSQL_KSQL_PERSISTENCE_DEFAULT_FORMAT_KEY: AVRO
-#      KSQL_KSQL_PERSISTENCE_DEFAULT_FORMAT_VALUE: AVRO
+      #      KSQL_KSQL_PERSISTENCE_DEFAULT_FORMAT_KEY: AVRO
+      #      KSQL_KSQL_PERSISTENCE_DEFAULT_FORMAT_VALUE: AVRO
       KSQL_CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
       KSQL_CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
       KSQL_CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
       KSQL_CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
-#      KSQL_CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "true"
-#      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-#      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+    #      KSQL_CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "true"
+    #      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+    #      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
     networks:
       - gmn_data_platform_network
 

@@ -159,7 +159,7 @@ def gmn_data_to_kafka_historical():
 
 
 default_args = {
-    "owner": "owner1",
+    "owner": "gmndatauser",
     "retires": 5,
     "retry_delay": timedelta(minutes=15),
 }

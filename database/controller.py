@@ -1,4 +1,4 @@
-from database import get_engine
+from __init__ import get_engine
 from sqlalchemy.orm import sessionmaker
 
 db = get_engine()
