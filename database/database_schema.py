@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, Float, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
@@ -16,15 +16,22 @@ class Trajectory(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    data = Column(mutable_json_type(dbtype=JSONB, nested=True))
+    # -- basic properties that define a meteor
+    beginning_utc_time = Column(DateTime, nullable=False)
+    latbeg_b_deg = Column(Float, nullable=False)
+    lonbeg_e_deg = Column(Float, nullable=False)
+    htbeg_km = Column(Float, nullable=False)
+    rageo_deg = Column(Float, nullable=False)
+    decgeo_deg = Column(Float, nullable=False)
+    vgeo_km_s = Column(Float, nullable=False)
 
-    # TODO: from data all definite data features into real data columns
+    # Extra trajectory properties calculated from the meteor properties
+    extra_data = Column(mutable_json_type(dbtype=JSONB, nested=True), nullable=False) # {...}
+    extra_data_avsc_version = Column(Integer, nullable=False)
 
-    iau_code_id = Column(Integer, ForeignKey('iau_code.id'), nullable=False)
+    # IAU shower relation
+    iau_code_id = Column(Integer, ForeignKey('iau_code.id'), nullable=True)
     iau_code = relationship('IAUCode')
-
-    station_id = Column(Integer, ForeignKey('station.id'), nullable=False)
-    station = relationship('Station')
 
     def __repr__(self):
         return f'<Trajectory {self.id}>'
