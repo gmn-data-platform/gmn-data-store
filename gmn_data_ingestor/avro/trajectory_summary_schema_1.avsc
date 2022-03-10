@@ -13,7 +13,10 @@
       "name": "beginning_utc_time",
       "type": [
         "null",
-        "string"
+        {
+          "type": "long",
+          "logicalType": "timestamp-micros"
+        }
       ]
     },
     {
@@ -594,7 +597,20 @@
       "name": "participating_stations",
       "type": [
         "null",
-        "string"
+        {
+          "type": "array",
+          "items": [
+            "null",
+            "string"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "schema_version",
+      "type": [
+        "null",
+        "long"
       ]
     }
   ]

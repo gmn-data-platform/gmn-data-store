@@ -16,7 +16,8 @@ from gmn_python_api.trajectory_summary_reader import \
     read_trajectory_summary_as_dataframe, DATETIME_FORMAT
 
 EXTRACTED_DATA_DIRECTORY = '~/extracted_data'
-AVRO_SCHEMA_PATH = f"{os.path.dirname(__file__)}/avro/trajectory_summary_schema.avsc"
+SCHEMA_VERSION = 1
+AVRO_SCHEMA_PATH = f"{os.path.dirname(__file__)}/avro/trajectory_summary_schema_{SCHEMA_VERSION}.avsc"
 AVRO_SCHEMA = avro.load(AVRO_SCHEMA_PATH)
 
 
@@ -87,18 +88,17 @@ def gmn_data_to_kafka_daily(day_offset: int = 0):
 
     trajectory_df = read_trajectory_summary_as_dataframe(extracted_file_path)
     print(f"Shape of the data = {trajectory_df.shape}\n")
-
     trajectory_df['IAU (code)'] = trajectory_df['IAU (code)'].astype('unicode')
-    trajectory_df['Participating (stations)'] = trajectory_df[
-        'Participating (stations)'].astype('unicode')
-    trajectory_df['Beginning (UTC Time)'] = trajectory_df[
-        'Beginning (UTC Time)'].dt.strftime(DATETIME_FORMAT)
+    trajectory_df['Participating (stations)'] = trajectory_df['Participating (stations)'].apply(lambda x: x[1:-1].split(','))
 
     trajectory_df.columns = trajectory_df.columns.str.replace('[^0-9a-zA-Z]+', '_')
     trajectory_df.columns = trajectory_df.columns.str.rstrip('_')
     trajectory_df.columns = trajectory_df.columns.str.lstrip('_')
     trajectory_df.columns = trajectory_df.columns.str.replace('Q_AU', 'q_au_')
     trajectory_df.columns = trajectory_df.columns.str.lower()
+
+    trajectory_df['schema_version'] = SCHEMA_VERSION
+    trajectory_df.schema_version = trajectory_df.schema_version.astype('int')
 
     avroProducer = AvroProducer({
         'bootstrap.servers': 'kafka-broker:29092',
@@ -107,8 +107,15 @@ def gmn_data_to_kafka_daily(day_offset: int = 0):
     }, default_key_schema=None, default_value_schema=AVRO_SCHEMA)
 
     for index, row in trajectory_df.iterrows():
-        print(f"Sending index {index}, row = {row} to kafka")
-        avroProducer.produce(topic='extracted', value=row.to_dict(), key=None)
+        row_dict = dict(row.to_dict())
+
+        # replace all values of "<NA>" with None
+        for key, value in row_dict.items():
+            if value == "<NA>":
+                row_dict[key] = None
+
+        print(f"Sending index {index}, row = {row_dict} to kafka")
+        avroProducer.produce(topic='trajectory_summary', value=row_dict, key=None)
         avroProducer.poll(0)
         print(f"Successfully sent index {index}")
     avroProducer.flush()
@@ -144,6 +151,9 @@ def gmn_data_to_kafka_historical():
     trajectory_df.columns = trajectory_df.columns.str.replace('Q_AU', 'q_au_')
     trajectory_df.columns = trajectory_df.columns.str.lower()
 
+    trajectory_df['schema_version'] = SCHEMA_VERSION
+    trajectory_df.schema_version = trajectory_df.schema_version.astype('int')
+
     avroProducer = AvroProducer({
         'bootstrap.servers': 'kafka-broker:29092',
         'on_delivery': delivery_trajectory_summary,
@@ -152,7 +162,7 @@ def gmn_data_to_kafka_historical():
 
     for index, row in trajectory_df.iterrows():
         print(f"Sending index {index}, row = {row.to_dict()} to kafka")
-        avroProducer.produce(topic='extracted', value=row.to_dict(), key=None)
+        avroProducer.produce(topic='trajectory_summary', value=row.to_dict(), key=None)
         avroProducer.poll(0)
         print(f"Successfully sent index {index}")
     avroProducer.flush()
