@@ -288,6 +288,7 @@ services:
       - "5432:5432"
     volumes:
       - gmn_data_store-postgres-db-volume:/var/lib/postgresql/data
+      - pglogs:/var/log/postgresql/:rw
     env_file:
       - ./database/.env
     networks:
@@ -521,6 +522,8 @@ services:
     networks:
       - gmn_data_platform_network
 
+  # Elasticsearch ----------------------------------------------------------------------
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
     container_name: elasticsearch
@@ -562,6 +565,8 @@ services:
 volumes:
   airflow-postgres-db-volume:
   gmn_data_store-postgres-db-volume:
+  pglogs:
+    driver: local
 
 # Networks -----------------------------------------------------------------------------
 networks:
