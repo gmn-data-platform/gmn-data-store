@@ -9,11 +9,11 @@ stop_and_clean_services: stop_and_clean_all_services
 
 init_database_services:
 	echo "Initializing database services"
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up --abort-on-container-exit db-init
+	docker-compose --env-file ./gmn_data_ingestor/.env up --abort-on-container-exit db-init
 
 run_database_services:
 	echo "Running database services"
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up -d db
+	docker-compose --env-file ./gmn_data_ingestor/.env up -d db
 
 run_database_tests:
 	echo "Running database tests"
@@ -27,9 +27,9 @@ init_ingestor_services:
 	cd gmn_data_ingestor
 	echo -e "AIRFLOW_UID=$(shell id -u)" > .env
 	#cd ../
-#	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up --abort-on-container-exit kafka-init
-#	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up --abort-on-container-exit airflow-init
-	# docker-compose -p gmn_data_ingestor up ksqldb-init
+#	docker-compose --env-file ./gmn_data_ingestor/.env up --abort-on-container-exit kafka-init
+#	docker-compose --env-file ./gmn_data_ingestor/.env up --abort-on-container-exit airflow-init
+	# docker-compose up ksqldb-init
 
 test_run_main_dag:
 	echo "Test running the main dag"
@@ -41,23 +41,23 @@ run_ingestor_tests:
 
 run_all_services:
 	echo "Running all services"
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor up -d
+	docker-compose --env-file ./gmn_data_ingestor/.env up -d
 
 view_all_logs:
 	echo "Viewing all logs"
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor logs -f
+	docker-compose --env-file ./gmn_data_ingestor/.env logs -f
 
 stop_all_services:
 	echo "Stopping ingestor services"
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor down --remove-orphans
+	docker-compose --env-file ./gmn_data_ingestor/.env down --remove-orphans
 
 stop_and_clean_all_services:
 	echo "Stopping and cleaning all services"
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor down -v --rmi all
+	docker-compose --env-file ./gmn_data_ingestor/.env down -v --rmi all
 
 restart_all_services:
 	echo "Restarting all services"
-	docker-compose --env-file ./gmn_data_ingestor/.env -p gmn_data_ingestor restart
+	docker-compose --env-file ./gmn_data_ingestor/.env restart
 
 generate_avro_schema:
 	# TODO move avro init to gmn-python-api
