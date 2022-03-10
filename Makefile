@@ -63,4 +63,4 @@ generate_avro_schema:
 	# TODO move avro init to gmn-python-api
 	cd gmn_data_ingestor/avro
 	python -m pip install pandavro==1.6.0 avro==1.11.0 gmn-python-api==0.0.1
-	python generate_trajectory_summary_avro_schema.py
+	python generate_kafka_topic_avro_schemas_from_csv.py
