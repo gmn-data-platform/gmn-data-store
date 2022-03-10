@@ -2,10 +2,9 @@
 SHELL=/bin/bash
 
 init_services: init_database_services init_ingestor_services
-run_services: run_all_services
 run_tests: run_database_tests run_ingestor_tests
-stop_services: stop_all_services
-stop_and_clean_services: stop_and_clean_all_services
+stop_services: stop_services
+stop_and_clean_services: stop_and_clean_services
 
 init_database_services:
 	echo "Initializing database services"
@@ -39,23 +38,23 @@ run_ingestor_tests:
 	echo "Running ingestor tests"
 	docker exec -it gmn_data_ingestor-airflow-worker-1 pytest /opt/airflow/tests
 
-run_all_services:
+run_services:
 	echo "Running all services"
 	docker-compose --env-file ./gmn_data_ingestor/.env up -d
 
-view_all_logs:
+view_logs:
 	echo "Viewing all logs"
 	docker-compose --env-file ./gmn_data_ingestor/.env logs -f
 
-stop_all_services:
+stop_services:
 	echo "Stopping ingestor services"
 	docker-compose --env-file ./gmn_data_ingestor/.env down --remove-orphans
 
-stop_and_clean_all_services:
+stop_and_clean_services:
 	echo "Stopping and cleaning all services"
 	docker-compose --env-file ./gmn_data_ingestor/.env down -v --rmi all
 
-restart_all_services:
+restart_services:
 	echo "Restarting all services"
 	docker-compose --env-file ./gmn_data_ingestor/.env restart
 

@@ -306,7 +306,6 @@ services:
     networks:
       - gmn_data_platform_network
 
-
   # Airflow ----------------------------------------------------------------------------
   postgres:
     image: postgres:13
@@ -523,7 +522,6 @@ services:
       - gmn_data_platform_network
 
   # Elasticsearch ----------------------------------------------------------------------
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
     container_name: elasticsearch

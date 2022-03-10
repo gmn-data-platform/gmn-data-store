@@ -8,12 +8,7 @@ Global Meteor Network database schema and data ingestion.
 | [Docker Compose v2](https://docs.docker.com/compose/cli-command/) | A tool for defining multi-container apps                |
 | [GNU Make 4.1+](https://www.gnu.org/software/make/)               | A tool which allows an easy way to run project commands |
 
-## Database Schema
-...
-
-## GMN Data Ingestor
-
-### Setup environment variables with .env
+## Setup environment variables with .env
 Setup environment files:
 ```sh
 # Linux/Mac
@@ -25,17 +20,23 @@ copy database/.env.default database/.env
 
 Then input environment variables in `.env`  to match your own system/configuration.
 
-### Running using Docker Compose
+## Running using Docker Compose
 ```sh
-make init_ingestor_services
-make run_ingestor_services
+make init_services
+make run_services
 ```
-Go to http://localhost:8080 for the Airflow UI.
+
+Main endpoints 
+- Airflow UI - http://0.0.0.0:8080/
+- Elastic - http://localhost:5601/
+- Kibana - http://localhost:5601/
 
 Check logs with:
 ```sh
-docker compose logs
+make view_logs
 ```
+
+### Airflow
 
 Access the Airflow CLI like so:
 ```sh
@@ -51,7 +52,7 @@ curl -X GET --user "airflow:airflow" "http://localhost:8080/api/v1/dags"
 
 Stop database services with:
 ```sh
-make stop_ingestor_services
+make stop_services
 ```
 
 See the [makefile](Makefile) for more commands.
