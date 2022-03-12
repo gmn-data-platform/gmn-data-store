@@ -272,11 +272,25 @@ services:
   ksqldb-cli:
     image: confluentinc/ksqldb-cli:0.23.1
     container_name: ksqldb-cli
+    profiles:
+      - debug
     depends_on:
       - kafka-broker
       - ksqldb-server
     entrypoint: /bin/sh
     tty: true
+    networks:
+      - gmn_data_platform_network
+
+  # Kafka connectors -------------------------------------------------------------------
+  kafka-db-sink:
+    build: gmn_data_ingestor/kafka_db_sink
+    volumes:
+      - ./gmn_data_ingestor/kafka_db_sink:/app
+      - ./database/:/database/
+    depends_on:
+      - kafka-broker
+      - db
     networks:
       - gmn_data_platform_network
 
