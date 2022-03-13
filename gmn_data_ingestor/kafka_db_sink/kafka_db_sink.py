@@ -14,7 +14,7 @@ c = AvroConsumer({
     'enable.auto.commit': False,
     'schema.registry.url': 'http://schema-registry:8081'})
 
-c.subscribe(['trajectory_summary'])
+c.subscribe(['trajectory_summary_raw'])
 
 print("starting")
 while True:

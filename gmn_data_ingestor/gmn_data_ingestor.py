@@ -118,7 +118,7 @@ def gmn_data_to_kafka_daily(day_offset: int = 0):
                 row_dict[key] = None
 
         print(f"Sending index {index}, row = {row_dict} to kafka")
-        avroProducer.produce(topic='trajectory_summary', value=row_dict, key=None)
+        avroProducer.produce(topic='trajectory_summary_raw', value=row_dict, key=None)
         avroProducer.poll(0)
         print(f"Successfully sent index {index}")
     avroProducer.flush()
@@ -165,7 +165,7 @@ def gmn_data_to_kafka_historical():
 
     for index, row in trajectory_df.iterrows():
         print(f"Sending index {index}, row = {row.to_dict()} to kafka")
-        avroProducer.produce(topic='trajectory_summary', value=row.to_dict(), key=None)
+        avroProducer.produce(topic='trajectory_summary_raw', value=row.to_dict(), key=None)
         avroProducer.poll(0)
         print(f"Successfully sent index {index}")
     avroProducer.flush()

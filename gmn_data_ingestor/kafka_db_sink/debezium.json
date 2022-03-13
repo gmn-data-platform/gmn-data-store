@@ -1,5 +1,5 @@
 {
-  "name": "exampledb-connector",
+  "name": "debezium-connector",
   "config": {
     "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
     "plugin.name": "pgoutput",
@@ -9,6 +9,6 @@
     "database.password": "pass",
     "database.dbname": "gmn_data_store",
     "database.server.name": "db",
-    "table.include.list": "public.trajectory"
+    "table.include.list": "public.trajectory, public.iau_shower, public.station, public.participating_stations"
   }
 }

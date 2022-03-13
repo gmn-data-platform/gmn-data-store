@@ -95,8 +95,11 @@ services:
       - kafka-broker
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
               cub kafka-ready -b kafka-broker:29092 1 30 && \
-              kafka-topics --create --topic trajectory_summary --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              kafka-topics --create --topic db.public.trajectory --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
+              kafka-topics --create --topic trajectory_summary_raw --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              #kafka-topics --create --topic db.public.iau_shower --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              #kafka-topics --create --topic db.public.station --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              #kafka-topics --create --topic db.public.participating_station --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              #kafka-topics --create --topic db.public.trajectory --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
     networks:
       - gmn_data_platform_network
 
@@ -153,9 +156,9 @@ services:
           sleep 5
         done
         sleep 10
-        curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$TRAJ_SUMMARY_SCHEMA}" http://schema-registry:8081/subjects/trajectory_summary-value/versions
+        curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$TRAJ_SUMMARY_SCHEMA}" http://schema-registry:8081/subjects/trajectory_summary_raw-value/versions
         curl -X GET http://schema-registry:8081/subjects
-        curl -X GET http://schema-registry:8081/subjects/trajectory_summary-value/versions
+        curl -X GET http://schema-registry:8081/subjects/trajectory_summary_raw-value/versions
         # curl -X GET http://schema-registry:8081/subjects/trajectory_summary_failed-value/versions
     networks:
       - gmn_data_platform_network
