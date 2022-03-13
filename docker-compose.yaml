@@ -96,87 +96,7 @@ services:
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
               cub kafka-ready -b kafka-broker:29092 1 30 && \
               kafka-topics --create --topic trajectory_summary --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              kafka-topics --create --topic trajectory_summary_failed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              kafka-topics --create --topic transformed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              kafka-topics --create --topic transformed_failed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              kafka-topics --create --topic loaded --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              kafka-topics --create --topic loaded_failed --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
-    networks:
-      - gmn_data_platform_network
-
-  kafka-connect-01:
-    image: confluentinc/cp-kafka-connect-base:6.2.0
-    container_name: kafka-connect-01
-    depends_on:
-      - kafka-broker
-      - schema-registry
-    links:
-      - schema-registry
-      - kafka-broker
-    ports:
-      - 8083:8083
-    environment:
-      CONNECT_BOOTSTRAP_SERVERS: kafka-broker:29092
-      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect-01"
-      CONNECT_REST_PORT: 8083
-      CONNECT_GROUP_ID: kafka-connect-01
-      CONNECT_CONFIG_STORAGE_TOPIC: _kafka-connect-01-configs
-      CONNECT_OFFSET_STORAGE_TOPIC: _kafka-connect-01-offsets
-      CONNECT_STATUS_STORAGE_TOPIC: _kafka-connect-01-status
-      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
-      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
-      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
-      CONNECT_LOG4J_APPENDER_STDOUT_LAYOUT_CONVERSIONPATTERN: "[%d] %p %X{connector.context}%m (%c:%L)%n"
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
-        # If you want to use the Confluent Hub installer to d/l component, but make them available
-        # when running this offline, spin up the stack once and then run :
-        #   docker cp kafka-connect-01:/usr/share/confluent-hub-components ./connectors
-        #   mv ./connectors/confluent-hub-components/* ./connectors
-      #   rm -rf ./connectors/confluent-hub-components
-      #CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components/,/connectors/'
-    #volumes:
-    #  - $PWD/connectors:/connectors
-    # In the command section, $ are replaced with $$ to avoid the error 'Invalid interpolation format for "command" option'
-    command:
-      - bash
-      - -c
-      - |
-        # Nasty hack for ECS
-        echo '127.0.0.1 kafka-connect-01' >> /etc/hosts
-        #
-        echo "Installing connector plugins"
-        confluent-hub install --no-prompt debezium/debezium-connector-mysql:1.6.0
-        confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.5.0
-        confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:11.1.1
-        #
-        echo "Launching Kafka Connect worker"
-        /etc/confluent/docker/run & 
-        #
-        echo "Waiting for Kafka Connect to start listening on localhost ⏳"
-        while : ; do
-          curl_status=$$(curl -s -o /dev/null -w %{http_code} http://localhost:8083/connectors)
-          echo -e $$(date) " Kafka Connect listener HTTP state: " $$curl_status " (waiting for 200)"
-          if [ $$curl_status -eq 200 ] ; then
-            break
-          fi
-          sleep 5 
-        done
-        #echo -e "\n--\n+> Creating Data Generator source"
-        #curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/source-datagen-01/config \
-        #    -d '{
-        #    "connector.class": "io.confluent.kafka.connect.datagen.DatagenConnector",
-        #    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
-        #    "kafka.topic": "ratings",
-        #    "max.interval":750,
-        #    "quickstart": "ratings",
-        #    "tasks.max": 1
-        #}'
-        sleep infinity
+              kafka-topics --create --topic db.public.trajectory --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
     networks:
       - gmn_data_platform_network
 
@@ -236,7 +156,7 @@ services:
         curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$TRAJ_SUMMARY_SCHEMA}" http://schema-registry:8081/subjects/trajectory_summary-value/versions
         curl -X GET http://schema-registry:8081/subjects
         curl -X GET http://schema-registry:8081/subjects/trajectory_summary-value/versions
-        curl -X GET http://schema-registry:8081/subjects/trajectory_summary_failed-value/versions
+        # curl -X GET http://schema-registry:8081/subjects/trajectory_summary_failed-value/versions
     networks:
       - gmn_data_platform_network
 
@@ -294,6 +214,110 @@ services:
     networks:
       - gmn_data_platform_network
 
+  kafka-connect-01:
+    image: confluentinc/cp-kafka-connect-base:6.2.0
+    container_name: kafka-connect-01
+    depends_on:
+      - kafka-broker
+      - schema-registry
+    links:
+      - schema-registry
+      - kafka-broker
+    ports:
+      - 8083:8083
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka-broker:29092
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect-01"
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: kafka-connect-01
+      CONNECT_CONFIG_STORAGE_TOPIC: _kafka-connect-01-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: _kafka-connect-01-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: _kafka-connect-01-status
+      CONNECT_KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: 'http://schema-registry:8081'
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
+      CONNECT_LOG4J_APPENDER_STDOUT_LAYOUT_CONVERSIONPATTERN: "[%d] %p %X{connector.context}%m (%c:%L)%n"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+        # If you want to use the Confluent Hub installer to d/l component, but make them available
+        # when running this offline, spin up the stack once and then run :
+      #   docker cp kafka-connect-01:/usr/share/confluent-hub-components ./connectors
+      #   mv ./connectors/confluent-hub-components/* ./connectors
+      #   rm -rf ./connectors/confluent-hub-components
+      #CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components/,/connectors/'
+    #volumes:
+    #  - $PWD/connectors:/connectors
+    # In the command section, $ are replaced with $$ to avoid the error 'Invalid interpolation format for "command" option'
+    command:
+      - bash
+      - -c
+      - |
+        # Nasty hack for ECS
+        echo '127.0.0.1 kafka-connect-01' >> /etc/hosts
+        #
+        echo "Installing connector plugins"
+        confluent-hub install --no-prompt debezium/debezium-connector-postgresql:1.8.1
+        #confluent-hub install --no-prompt confluentinc/kafka-connect-datagen:0.5.0
+        confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:11.1.1
+        #
+        echo "Launching Kafka Connect worker"
+        /etc/confluent/docker/run & 
+        #
+        echo "Waiting for Kafka Connect to start listening on localhost ⏳"
+        while : ; do
+          curl_status=$$(curl -s -o /dev/null -w %{http_code} http://localhost:8083/connectors)
+          echo -e $$(date) " Kafka Connect listener HTTP state: " $$curl_status " (waiting for 200)"
+          if [ $$curl_status -eq 200 ] ; then
+            break
+          fi
+          sleep 5 
+        done
+        #echo -e "\n--\n+> Creating Data Generator source"
+        #curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/source-datagen-01/config \
+        #    -d '{
+        #    "connector.class": "io.confluent.kafka.connect.datagen.DatagenConnector",
+        #    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+        #    "kafka.topic": "ratings",
+        #    "max.interval":750,
+        #    "quickstart": "ratings",
+        #    "tasks.max": 1
+        #}'
+        sleep infinity
+    networks:
+      - gmn_data_platform_network
+
+  debezium:
+    image: debezium/connect:1.4
+    environment:
+      BOOTSTRAP_SERVERS: kafka-broker:29092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect_configs
+      OFFSET_STORAGE_TOPIC: connect_offsets
+      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    depends_on:
+      - kafka-broker
+    ports:
+      - 8084:8083
+    networks:
+      - gmn_data_platform_network
+
+  debezium-init:
+    image: debezium/connect:1.4
+    depends_on:
+      - debezium
+    volumes:
+      - ./gmn_data_ingestor/kafka_db_sink/:/kafka_db_sink/
+    command: ["bash", "-c", 'curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 120 debezium:8083/connectors/ --data "@/kafka_db_sink/debezium.json"']
+    networks:
+      - gmn_data_platform_network
+
   # Postgres ---------------------------------------------------------------------------
   db:
     image: postgres
@@ -305,6 +329,7 @@ services:
       - pglogs:/var/log/postgresql/:rw
     env_file:
       - ./database/.env
+    command: [ "postgres", "-c", "wal_level=logical" ]
     networks:
       - gmn_data_platform_network
 

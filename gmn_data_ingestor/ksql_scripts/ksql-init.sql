@@ -12,11 +12,31 @@ CREATE SINK CONNECTOR SINK_ELASTIC_1 WITH (
   'value.converter'                     = 'io.confluent.connect.avro.AvroConverter',
   'value.converter.schema.registry.url' = 'http://schema-registry:8081',
   'type.name'                           = '_doc',
-  'topics'                              = 'trajectory_summary',
+  'topics'                              = 'trajectory_summary, db.public.trajectory',
   'key.ignore'                          = 'true',
   'schema.ignore'                       = 'false'
 );
-
+--   'transforms'= 'ExtractTimestamp',
+--   'transforms.ExtractTimestamp.type'= 'org.apache.kafka.connect.transforms.InsertField$Value',
+--   'transforms.ExtractTimestamp.timestamp.field' = 'RATING_TS'
+-- CREATE SOURCE CONNECTOR SOURCE_POSTGRES_01 WITH (
+--     'connector.class' = 'io.debezium.connector.postgresql.PostgresConnector',
+--     'database.hostname' = 'db',
+--     'database.port' = '5432',
+--     'database.user' = 'test_user',
+--     'database.password' = 'pass',
+--     'database.dbname' = 'gmn_data_store',
+--     'database.server.name' = 'db',
+--     'table.include.list' = 'public.trajectory',
+--     'database.history.kafka.bootstrap.servers' = 'kafka-broker:29092',
+--     'database.history.kafka.topic' = 'loaded' ,
+--     'include.schema.changes' = 'false',
+-- --     'key.converter'= 'org.apache.kafka.connect.storage.StringConverter',
+-- --     'value.converter'= 'io.confluent.connect.avro.AvroConverter',
+--     'value.converter'= 'org.apache.kafka.connect.storage.StringConverter',
+--     'value.converter.schema.registry.url'= 'http://schema-registry:8081'
+-- );
+--
 
 -- CREATE STREAM ID NOT EXISTS trajectory_participating_station_stream
 -- WITH (KAFKA_TOPIC='trajectory_participating_station', VALUE_FORMAT='AVRO')

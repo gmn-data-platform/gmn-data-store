@@ -56,8 +56,11 @@ if __name__ == '__main__':
         create_database(DB_URI)
     print(f"Created database {os.getenv('POSTGRES_DB')} if it didn't exist.")
 
-    Base.metadata.create_all(get_engine())
+    engine = get_engine()
+    Base.metadata.create_all(engine)
     print("Created tables")
+
+    engine.execute("ALTER TABLE public.trajectory REPLICA IDENTITY FULL;")
 
     seed_data()
     print("Populated with initial data")

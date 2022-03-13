@@ -1,3 +1,4 @@
+import math
 from datetime import timedelta, datetime
 
 import os
@@ -112,6 +113,8 @@ def gmn_data_to_kafka_daily(day_offset: int = 0):
         # replace all values of "<NA>" with None
         for key, value in row_dict.items():
             if value == "<NA>":
+                row_dict[key] = None
+            elif isinstance(value, float) and math.isnan(value):
                 row_dict[key] = None
 
         print(f"Sending index {index}, row = {row_dict} to kafka")
