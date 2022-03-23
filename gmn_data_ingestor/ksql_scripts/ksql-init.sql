@@ -10,11 +10,18 @@ WITH (KAFKA_TOPIC='trajectory_summary_raw', VALUE_FORMAT='AVRO');
 CREATE STREAM IF NOT EXISTS db_public_trajectory WITH (KAFKA_TOPIC='db.public.trajectory',VALUE_FORMAT='AVRO');
 CREATE STREAM IF NOT EXISTS db_public_iau_shower_stream WITH (KAFKA_TOPIC='db.public.iau_shower',VALUE_FORMAT='AVRO');
 CREATE STREAM IF NOT EXISTS db_public_station_stream WITH (KAFKA_TOPIC='db.public.station',VALUE_FORMAT='AVRO');
-CREATE STREAM IF NOT EXISTS db_public_participating_stream WITH (KAFKA_TOPIC='db.public.participating_station',VALUE_FORMAT='AVRO');
+CREATE STREAM IF NOT EXISTS db_public_participating_station_stream WITH (KAFKA_TOPIC='db.public.participating_station',VALUE_FORMAT='AVRO');
 
-CREATE STREAM IF NOT EXISTS db_flat WITH (KAFKA_TOPIC='db_flat',VALUE_FORMAT='AVRO')
-
-FROM db_public_trajectory;
+-- CREATE STREAM IF NOT EXISTS db_trajectory_flat WITH (KAFKA_TOPIC='db_flat',VALUE_FORMAT='AVRO') AS
+--      SELECT *, <flatten JSON String db_trajectory_flat.data>
+--      STRUCT("lat" := latbeg_n_deg, "lon":= lonbeg_e_deg) AS "beg_lat_lon",
+--      STRUCT("lat" := latend_n_deg, "lon":= lonend_e_deg) AS "end_lat_lon",
+--    FROM db_public_trajectory
+--    LEFT JOIN db_public_iau_shower_stream ON db_public_trajectory.iau_shower_id = db_public_iau_shower_stream.id
+--    LEFT JOIN db_public_participating_station_stream ON db_public_trajectory.id = db_public_participating_station_stream.trajectory_id
+--    LEFT JOIN db_public_station_stream ON db_public_participating_station_stream.station_id = db_public_station_stream.id
+--    EMIT CHANGES;
+-- FROM db_public_trajectory;
 
 CREATE SINK CONNECTOR SINK_ELASTIC_1 WITH (
   'connector.class'                     = 'io.confluent.connect.elasticsearch.ElasticsearchSinkConnector',
