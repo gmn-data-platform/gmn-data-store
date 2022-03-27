@@ -9,10 +9,12 @@ from sqlalchemy_json import mutable_json_type
 
 Base = declarative_base()
 
+SCHEMA_VERSION = "2.0"
+AVSC_PATH = "/avro/trajectory_summary_schema_2.0.avsc"
 
 class Trajectory(Base):
     __tablename__ = 'trajectory'
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String, primary_key=True)
     # meteor_id = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -28,7 +30,7 @@ class Trajectory(Base):
 
     # Extra trajectory properties calculated from the meteor properties
     data = Column(mutable_json_type(dbtype=JSONB, nested=True), nullable=False) # {...}
-    data_schema_version = Column(Integer, nullable=False)
+    schema_version = Column(String, nullable=False)
 
     # IAU shower relation
     iau_shower_id = Column(Integer, ForeignKey('iau_shower.id'), nullable=True)
@@ -73,7 +75,7 @@ class ParticipatingStation(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    trajectory_id = Column(Integer, ForeignKey('trajectory.id'), nullable=False)
+    trajectory_id = Column(String, ForeignKey('trajectory.id'), nullable=False)
     station_id = Column(Integer, ForeignKey('station.id'), nullable=False)
 
     meteor = relationship('Trajectory', backref='recorded_by_station')

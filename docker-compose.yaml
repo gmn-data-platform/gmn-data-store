@@ -19,7 +19,7 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pytest==6.2.5 confluent-kafka==1.8.2 kafka-python==2.0.2 gmn-python-api==0.0.1 kafka-python==2.0.2 fastavro==1.4.9 pandavro==1.6.0 avro==1.11.0 numpy>1.20.3}
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pytest==6.2.5 confluent-kafka==1.8.2 kafka-python==2.0.2 gmn-python-api==0.0.3 kafka-python==2.0.2 fastavro==1.4.9 pandavro==1.6.0 avro==1.11.0 numpy>1.20.3}
     PYTHONPATH: "/home/airflow/.local/lib/python3.7/site-packages"
   volumes:
     - ./gmn_data_ingestor/:/opt/airflow/dags
@@ -95,11 +95,11 @@ services:
       - kafka-broker
     command: "bash -c 'echo Waiting for Kafka to be ready... && \
               cub kafka-ready -b kafka-broker:29092 1 30 && \
-              kafka-topics --create --topic trajectory_summary_raw --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
-              #kafka-topics --create --topic db.public.iau_shower --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              #kafka-topics --create --topic db.public.station --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              #kafka-topics --create --topic db.public.participating_station --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-              #kafka-topics --create --topic db.public.trajectory --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
+              kafka-topics --create --topic trajectory_summary_raw --partitions 3 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic db.public.iau_shower --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic db.public.station --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic db.public.participating_station --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+              kafka-topics --create --topic db.public.trajectory --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181'"
     networks:
       - gmn_data_platform_network
 
@@ -147,7 +147,7 @@ services:
       - -c
       - |
         apk update && apk add curl jq && rm -rf /var/cache/apk/*
-        export TRAJ_SUMMARY_SCHEMA=$$(jq tostring /avro/trajectory_summary_schema_1.avsc)
+        export TRAJ_SUMMARY_SCHEMA=$$(jq tostring /avro/trajectory_summary_schema_2.0.avsc)
         echo "{\"schema\":$$TRAJ_SUMMARY_SCHEMA}"
         echo -e "\n\n Waiting for http://schema-registry:8081 to be available before launching CLI\n"
         while [ $$(curl -s -o /dev/null -w %{http_code} http://schema-registry:8081) -eq 000 ]
@@ -159,7 +159,6 @@ services:
         curl -X POST -H "Content-Type:application/json" -d"{\"schema\":$$TRAJ_SUMMARY_SCHEMA}" http://schema-registry:8081/subjects/trajectory_summary_raw-value/versions
         curl -X GET http://schema-registry:8081/subjects
         curl -X GET http://schema-registry:8081/subjects/trajectory_summary_raw-value/versions
-        # curl -X GET http://schema-registry:8081/subjects/trajectory_summary_failed-value/versions
     networks:
       - gmn_data_platform_network
 
@@ -306,6 +305,8 @@ services:
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
     depends_on:
       - kafka-broker
+      - db
+      - kafka-db-sink
     ports:
       - 8084:8083
     networks:
@@ -359,6 +360,7 @@ services:
     command: -c "python -m pip install -r /database/requirements.txt && python /database/setup_database.py"
     volumes:
       - ./database:/database
+      - ./gmn_data_ingestor/avro/:/avro
     networks:
       - gmn_data_platform_network
 

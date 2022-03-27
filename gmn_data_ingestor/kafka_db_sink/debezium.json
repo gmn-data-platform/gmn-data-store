@@ -9,6 +9,6 @@
     "database.password": "pass",
     "database.dbname": "gmn_data_store",
     "database.server.name": "db",
-    "table.include.list": "public.trajectory, public.iau_shower, public.station, public.participating_stations"
+    "table.include.list": "public.trajectory, public.iau_shower, public.station, public.participating_station"
   }
 }

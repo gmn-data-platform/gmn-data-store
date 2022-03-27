@@ -14,10 +14,10 @@ from gmn_python_api.data_directory import DATA_START_DATE
 from gmn_python_api.data_directory import get_daily_file_content_by_date, \
     get_file_content_from_url
 from gmn_python_api.trajectory_summary_reader import \
-    read_trajectory_summary_as_dataframe, DATETIME_FORMAT
+    read_trajectory_summary_as_dataframe
 
 EXTRACTED_DATA_DIRECTORY = '~/extracted_data'
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = "2.0"
 AVRO_SCHEMA_PATH = f"{os.path.dirname(__file__)}/avro/trajectory_summary_schema_{SCHEMA_VERSION}.avsc"
 AVRO_SCHEMA = avro.load(AVRO_SCHEMA_PATH)
 
@@ -87,19 +87,13 @@ def gmn_data_to_kafka_daily(day_offset: int = 0):
         context['execution_date'],
         file_content)
 
-    trajectory_df = read_trajectory_summary_as_dataframe(extracted_file_path)
+    trajectory_df = read_trajectory_summary_as_dataframe(extracted_file_path, camel_case_column_names=True)
+    trajectory_df.reset_index(inplace=True)
+    trajectory_df.rename(
+        columns={"Unique trajectory (identifier)": "unique_trajectory_identifier"},
+        inplace=True)
+    trajectory_df.iau_code = trajectory_df.iau_code.astype('unicode')
     print(f"Shape of the data = {trajectory_df.shape}\n")
-    trajectory_df['IAU (code)'] = trajectory_df['IAU (code)'].astype('unicode')
-    trajectory_df['Participating (stations)'] = trajectory_df['Participating (stations)'].apply(lambda x: x[1:-1].split(','))
-
-    trajectory_df.columns = trajectory_df.columns.str.replace('[^0-9a-zA-Z]+', '_')
-    trajectory_df.columns = trajectory_df.columns.str.rstrip('_')
-    trajectory_df.columns = trajectory_df.columns.str.lstrip('_')
-    trajectory_df.columns = trajectory_df.columns.str.replace('Q_AU', 'q_au_')
-    trajectory_df.columns = trajectory_df.columns.str.lower()
-
-    trajectory_df['schema_version'] = SCHEMA_VERSION
-    trajectory_df.schema_version = trajectory_df.schema_version.astype('int')
 
     avroProducer = AvroProducer({
         'bootstrap.servers': 'kafka-broker:29092',
@@ -139,23 +133,14 @@ def gmn_data_to_kafka_historical():
         context['execution_date'],
         file_content)
 
-    trajectory_df = read_trajectory_summary_as_dataframe(extracted_file_path)
+    trajectory_df = read_trajectory_summary_as_dataframe(extracted_file_path,
+                                                         camel_case_column_names=True)
+    trajectory_df.reset_index(inplace=True)
+    trajectory_df.rename(
+        columns={"Unique trajectory (identifier)": "unique_trajectory_identifier"},
+        inplace=True)
+    trajectory_df.iau_code = trajectory_df.iau_code.astype('unicode')
     print(f"Shape of the data = {trajectory_df.shape}\n")
-
-    trajectory_df['IAU (code)'] = trajectory_df['IAU (code)'].astype('unicode')
-    trajectory_df['Participating (stations)'] = trajectory_df[
-        'Participating (stations)'].astype('unicode')
-    trajectory_df['Beginning (UTC Time)'] = trajectory_df[
-        'Beginning (UTC Time)'].dt.strftime(DATETIME_FORMAT)
-
-    trajectory_df.columns = trajectory_df.columns.str.replace('[^0-9a-zA-Z]+', '_')
-    trajectory_df.columns = trajectory_df.columns.str.rstrip('_')
-    trajectory_df.columns = trajectory_df.columns.str.lstrip('_')
-    trajectory_df.columns = trajectory_df.columns.str.replace('Q_AU', 'q_au_')
-    trajectory_df.columns = trajectory_df.columns.str.lower()
-
-    trajectory_df['schema_version'] = SCHEMA_VERSION
-    trajectory_df.schema_version = trajectory_df.schema_version.astype('int')
 
     avroProducer = AvroProducer({
         'bootstrap.servers': 'kafka-broker:29092',

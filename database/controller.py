@@ -37,13 +37,15 @@ class DatabaseController:
         db_session = self.db_session_maker()
 
         main_meteor_props = [
+            'unique_trajectory_identifier',
             'beginning_utc_time',
             'latbeg_n_deg',
             'lonbeg_e_deg',
             'htbeg_km',
             'rageo_deg',
             'decgeo_deg',
-            'vgeo_km_s'
+            'vgeo_km_s',
+            'schema_version'
         ]
         other_excluded_data_jsonb_props = [
             'beginning_julian_date',
@@ -59,14 +61,15 @@ class DatabaseController:
 
         main_data_fields = {}
         for main_prop in main_meteor_props:
-            main_data_fields[main_prop] = row_dict[main_prop]
+            if main_prop != "unique_trajectory_identifier":
+                main_data_fields[main_prop] = row_dict[main_prop]
 
-        main_data_fields["beginning_utc_time"] = datetime.utcfromtimestamp(main_data_fields["beginning_utc_time"] / 1e6)
+        # main_data_fields["beginning_utc_time"] = datetime.utcfromtimestamp(main_data_fields["beginning_utc_time"] / 1e6)
 
         trajectory_row = db_session.merge(Trajectory(
+            id = row_dict["unique_trajectory_identifier"],
             # meteor_id=row_dict["meteor_id"],
             data=data_jsonb,
-            data_schema_version = row_dict["schema_version"],
             iau_shower_id = None if row_dict["iau_no"] == -1 else row_dict["iau_no"],
             **main_data_fields
         ))

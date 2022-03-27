@@ -6,11 +6,11 @@ SET 'cache.max.bytes.buffering' = '0';
 
 CREATE STREAM IF NOT EXISTS trajectory_summary_raw_stream
 WITH (KAFKA_TOPIC='trajectory_summary_raw', VALUE_FORMAT='AVRO');
-
-CREATE STREAM IF NOT EXISTS db_public_trajectory WITH (KAFKA_TOPIC='db.public.trajectory',VALUE_FORMAT='AVRO');
-CREATE STREAM IF NOT EXISTS db_public_iau_shower_stream WITH (KAFKA_TOPIC='db.public.iau_shower',VALUE_FORMAT='AVRO');
-CREATE STREAM IF NOT EXISTS db_public_station_stream WITH (KAFKA_TOPIC='db.public.station',VALUE_FORMAT='AVRO');
-CREATE STREAM IF NOT EXISTS db_public_participating_station_stream WITH (KAFKA_TOPIC='db.public.participating_station',VALUE_FORMAT='AVRO');
+--
+-- CREATE STREAM IF NOT EXISTS db_public_trajectory WITH (KAFKA_TOPIC='db.public.trajectory',VALUE_FORMAT='AVRO');
+-- CREATE STREAM IF NOT EXISTS db_public_iau_shower_stream WITH (KAFKA_TOPIC='db.public.iau_shower',VALUE_FORMAT='AVRO');
+-- CREATE STREAM IF NOT EXISTS db_public_station_stream WITH (KAFKA_TOPIC='db.public.station',VALUE_FORMAT='AVRO');
+-- CREATE STREAM IF NOT EXISTS db_public_participating_station_stream WITH (KAFKA_TOPIC='db.public.participating_station',VALUE_FORMAT='AVRO');
 
 -- CREATE STREAM IF NOT EXISTS db_trajectory_flat WITH (KAFKA_TOPIC='db_flat',VALUE_FORMAT='AVRO') AS
 --      SELECT *, <flatten JSON String db_trajectory_flat.data>
@@ -28,10 +28,14 @@ CREATE SINK CONNECTOR SINK_ELASTIC_1 WITH (
   'connection.url'                      = 'http://elasticsearch:9200',
   'value.converter'                     = 'io.confluent.connect.avro.AvroConverter',
   'value.converter.schema.registry.url' = 'http://schema-registry:8081',
+  'tasks.max'                           = '1',
   'type.name'                           = '_doc',
-  'topics'                              = 'trajectory_summary_raw, db.public.trajectory, db.public.iau_shower, db.public.station, db.public.participating_station',
+  'topics'                              = 'trajectory_summary_raw,db.public.trajectory,db.public.iau_shower,db.public.station,db.public.participating_station',
   'key.ignore'                          = 'true',
-  'schema.ignore'                       = 'false'
+  'schema.ignore'                       = 'true',
+  'schema.enable'                       = 'false',
+  'behavior.on.null.values'             = 'IGNORE',
+  'behavior.on.malformed.documents'     = 'IGNORE'
 );
 
 --   'transforms'= 'ExtractTimestamp',

@@ -3,6 +3,13 @@
   "name": "Root",
   "fields": [
     {
+      "name": "unique_trajectory_identifier",
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    {
       "name": "beginning_julian_date",
       "type": [
         "null",
@@ -610,7 +617,7 @@
       "name": "schema_version",
       "type": [
         "null",
-        "long"
+        "string"
       ]
     }
   ]
