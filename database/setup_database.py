@@ -2,45 +2,15 @@
 """Creates $POSTGRES_DB and setups up tables."""
 
 import os
-import requests
 from dotenv import load_dotenv
+from gmn_python_api import get_iau_showers
 from sqlalchemy_utils import database_exists, create_database
 
 from __init__ import DB_URI, get_engine
 from controller import DatabaseController
-from models import Base, IAUShower
-
-IAU_SHOWERS_LIST = "https://www.ta3.sk/IAUC22DB/MDC2007/Etc/streamfulldata.txt"
+from models import Base, IAUShower, add_trajectory_fields
 
 load_dotenv("/database/.env")
-
-
-def get_iau_showers():
-    r = requests.get(IAU_SHOWERS_LIST)
-    r.raise_for_status()
-
-    showers = {}
-    for row in r.text.splitlines():
-        if not row or row.startswith(":") or row.startswith("+"):
-            continue
-
-        row_values = row.split("|")
-
-        shower_no = row_values[1].strip('" ')
-        if shower_no in showers:
-            continue
-
-        shower_code = row_values[3].strip('" ')
-        shower_name = row_values[4].strip('" ')
-
-        showers[shower_no] = {
-            "id": shower_no,
-            "code": shower_code,
-            "name": shower_name
-        }
-
-    return showers
-
 
 def seed_data():
     initial_iau_showers = list(get_iau_showers().values())
@@ -58,9 +28,8 @@ if __name__ == '__main__':
 
     engine = get_engine()
     Base.metadata.create_all(engine)
+    add_trajectory_fields(engine)
     print("Created tables")
-
-    engine.execute("ALTER TABLE public.trajectory REPLICA IDENTITY FULL;")
 
     seed_data()
     print("Populated with initial data")
