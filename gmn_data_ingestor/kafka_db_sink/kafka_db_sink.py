@@ -6,7 +6,6 @@ from confluent_kafka.avro import AvroConsumer
 from confluent_kafka.avro.serializer import SerializerError
 
 from controller import DatabaseController
-# from models import Trajectory, Station, ParticipatingStation
 
 c = AvroConsumer({
     'bootstrap.servers': 'kafka-broker:29092',

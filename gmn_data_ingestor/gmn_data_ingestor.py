@@ -1,4 +1,3 @@
-import math
 from datetime import timedelta, datetime
 
 import os
@@ -7,19 +6,16 @@ from airflow.operators.python import get_current_context, PythonOperator
 from airflow.utils.dates import days_ago
 from airflow.decorators import dag
 
-from confluent_kafka import avro
 from confluent_kafka.avro import AvroProducer
 
 from gmn_python_api.data_directory import DATA_START_DATE
-from gmn_python_api.data_directory import get_daily_file_content_by_date, \
-    get_file_content_from_url
+from gmn_python_api.data_directory import get_daily_file_content_by_date
 from gmn_python_api.trajectory_summary_reader import \
     read_trajectory_summary_as_dataframe
+from gmn_python_api.trajectory_summary_schema import get_trajectory_summary_avro_schema
+from gmn_python_api import get_all_file_content
 
 EXTRACTED_DATA_DIRECTORY = '~/extracted_data'
-SCHEMA_VERSION = "2.0"
-AVRO_SCHEMA_PATH = f"{os.path.dirname(__file__)}/avro/trajectory_summary_schema_{SCHEMA_VERSION}.avsc"
-AVRO_SCHEMA = avro.load(AVRO_SCHEMA_PATH)
 
 
 def save_extracted_daily_trajectory_summary_file(extracted_data_directory: str,
@@ -87,30 +83,19 @@ def gmn_data_to_kafka_daily(day_offset: int = 0):
         context['execution_date'],
         file_content)
 
-    trajectory_df = read_trajectory_summary_as_dataframe(extracted_file_path, camel_case_column_names=True)
-    trajectory_df.reset_index(inplace=True)
-    trajectory_df.rename(
-        columns={"Unique trajectory (identifier)": "unique_trajectory_identifier"},
-        inplace=True)
-    trajectory_df.iau_code = trajectory_df.iau_code.astype('unicode')
+    trajectory_df = read_trajectory_summary_as_dataframe(extracted_file_path,
+                                                         avro_compatible=True)
     print(f"Shape of the data = {trajectory_df.shape}\n")
 
     avroProducer = AvroProducer({
         'bootstrap.servers': 'kafka-broker:29092',
         'on_delivery': delivery_trajectory_summary,
         'schema.registry.url': 'http://schema-registry:8081'
-    }, default_key_schema=None, default_value_schema=AVRO_SCHEMA)
+    }, default_key_schema=None,
+        default_value_schema=get_trajectory_summary_avro_schema())
 
     for index, row in trajectory_df.iterrows():
         row_dict = dict(row.to_dict())
-
-        # replace all values of "<NA>" with None
-        for key, value in row_dict.items():
-            if value == "<NA>":
-                row_dict[key] = None
-            elif isinstance(value, float) and math.isnan(value):
-                row_dict[key] = None
-
         print(f"Sending index {index}, row = {row_dict} to kafka")
         avroProducer.produce(topic='trajectory_summary_raw', value=row_dict, key=None)
         avroProducer.poll(0)
@@ -125,7 +110,7 @@ def gmn_data_to_kafka_historical():
         f"execution date {context['execution_date']}")
 
     # Find target_date filename by looking at the directory listing
-    file_content = get_file_content_from_url("https://globalmeteornetwork.org/data/traj_summary_data/traj_summary_all.txt")
+    file_content = get_all_file_content()
 
     # Write file to ~/extracted_date/{execution_date}/
     extracted_file_path = save_all_trajectory_summary_file(
@@ -134,23 +119,20 @@ def gmn_data_to_kafka_historical():
         file_content)
 
     trajectory_df = read_trajectory_summary_as_dataframe(extracted_file_path,
-                                                         camel_case_column_names=True)
-    trajectory_df.reset_index(inplace=True)
-    trajectory_df.rename(
-        columns={"Unique trajectory (identifier)": "unique_trajectory_identifier"},
-        inplace=True)
-    trajectory_df.iau_code = trajectory_df.iau_code.astype('unicode')
+                                                         avro_compatible=True)
     print(f"Shape of the data = {trajectory_df.shape}\n")
 
     avroProducer = AvroProducer({
         'bootstrap.servers': 'kafka-broker:29092',
         'on_delivery': delivery_trajectory_summary,
         'schema.registry.url': 'http://schema-registry:8081'
-    }, default_key_schema=None, default_value_schema=AVRO_SCHEMA)
+    }, default_key_schema=None,
+        default_value_schema=get_trajectory_summary_avro_schema())
 
     for index, row in trajectory_df.iterrows():
         print(f"Sending index {index}, row = {row.to_dict()} to kafka")
-        avroProducer.produce(topic='trajectory_summary_raw', value=row.to_dict(), key=None)
+        avroProducer.produce(topic='trajectory_summary_raw', value=row.to_dict(),
+                             key=None)
         avroProducer.poll(0)
         print(f"Successfully sent index {index}")
     avroProducer.flush()

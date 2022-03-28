@@ -1,6 +1,6 @@
 pytest==6.2.5
 kafka-python==2.0.2
-gmn-python-api==0.0.3
+gmn-python-api==0.0.4
 kafka-python==2.0.2
 avro==1.11.0
 fastavro==1.4.9
