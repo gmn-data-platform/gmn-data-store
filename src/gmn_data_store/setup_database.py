@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """This module creates database and setups up tables."""
-
 from gmn_python_api import get_iau_showers
 from sqlalchemy.engine import Engine
 
-from gmn_data_store import get_engine
 from gmn_data_store import controller
-from gmn_data_store.models import _Base, IAUShower, _add_meteor_fields
+from gmn_data_store import get_engine
+from gmn_data_store.models import _add_meteor_fields
+from gmn_data_store.models import _Base
+from gmn_data_store.models import IAUShower
 
 
 def setup_database() -> Engine:
     """
     Setup database, tables and seed data.
+
     :return: None
     """
     engine = get_engine()
@@ -23,9 +25,11 @@ def setup_database() -> Engine:
     print("Populated with initial data")
     return engine
 
+
 def seed_data(engine) -> None:
     """
     Seed data into database.
+
     :param engine: SQLAlchemy engine.
     :return: None.
     """
@@ -36,5 +40,5 @@ def seed_data(engine) -> None:
         controller.create_row(IAUShower, fields, engine=engine)
 
 
-if __name__ == '__main__':
-    setup_database() # pragma: no cover
+if __name__ == "__main__":
+    setup_database()  # pragma: no cover

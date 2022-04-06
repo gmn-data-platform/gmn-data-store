@@ -1,4 +1,4 @@
-"""Tests for the controller module"""
+"""Tests for the controller module."""
 import datetime
 import sys
 import unittest
@@ -16,9 +16,7 @@ class TestController(unittest.TestCase):
     """Tests for the controller module."""
 
     def tearDown(self):
-        """
-        Tear down the test.
-        """
+        """Tear down the test."""
         try:
             del sys.modules["gmn_data_store.setup_database"]
             del sys.modules["gmn_data_store.models"]

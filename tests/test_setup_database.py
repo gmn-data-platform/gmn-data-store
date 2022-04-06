@@ -12,6 +12,10 @@ class TestSetupDatabase(unittest.TestCase):
     """Tests for the setup_database module."""
 
     def setUp(self) -> None:
+        """
+        Setup the test.
+        :return: None
+        """
         self.test_showers = {
             "test1": {"id": 1, "code": "aaa", "name": "bbb"},
             "test2": {"id": 2, "code": "ccc", "name": "ddd"},
