@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """This module creates database and setups up tables."""
-from gmn_python_api import get_iau_showers
-from sqlalchemy.engine import Engine
+from gmn_python_api import get_iau_showers  # type: ignore
+from sqlalchemy.engine import Engine  # type: ignore
 
 from gmn_data_store import controller
 from gmn_data_store import get_engine
@@ -26,7 +26,7 @@ def setup_database() -> Engine:
     return engine
 
 
-def seed_data(engine) -> None:
+def seed_data(engine: Engine) -> None:
     """
     Seed data into database.
 

@@ -1,8 +1,8 @@
 """This module stores the database models."""
 from datetime import datetime
 
-from gmn_python_api import get_trajectory_summary_avro_schema
-from sqlalchemy import BigInteger
+from gmn_python_api import get_trajectory_summary_avro_schema  # type: ignore
+from sqlalchemy import BigInteger  # type: ignore
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -10,9 +10,10 @@ from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy.engine import Engine  # type: ignore
+from sqlalchemy.ext.declarative import declarative_base  # type: ignore
+from sqlalchemy.orm import relationship  # type: ignore
+from sqlalchemy.schema import UniqueConstraint  # type: ignore
 
 from gmn_data_store import get_engine
 
@@ -34,7 +35,7 @@ _FIELDS_IN_METEOR_TABLE_NOT_TRAJECTORY_SUMMARY = [
 ]
 
 
-class Meteor(_Base):
+class Meteor(_Base):  # type: ignore
     """Meteor table class."""
 
     __tablename__ = "meteor"
@@ -47,7 +48,7 @@ class Meteor(_Base):
     iau_shower_id = Column(Integer, ForeignKey("iau_shower.id"), nullable=True)
     iau_shower = relationship("IAUShower")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Return a string representation of the row.
         :return: string representation of the row.
@@ -55,7 +56,7 @@ class Meteor(_Base):
         return f"<Meteor {self.id}>"  # pragma: no cover
 
 
-class IAUShower(_Base):
+class IAUShower(_Base):  # type: ignore
     """IAUShower table class."""
 
     __tablename__ = "iau_shower"
@@ -67,7 +68,7 @@ class IAUShower(_Base):
 
     __table_args__ = (UniqueConstraint("code"),)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Return a string representation of the row.
         :return: string representation of the row.
@@ -77,7 +78,7 @@ class IAUShower(_Base):
         )  # pragma: no cover
 
 
-class Station(_Base):
+class Station(_Base):  # type: ignore
     """Station table class."""
 
     __tablename__ = "station"
@@ -88,7 +89,7 @@ class Station(_Base):
 
     __table_args__ = (UniqueConstraint("code"),)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Return a string representation of the row.
         :return: string representation of the row.
@@ -96,7 +97,7 @@ class Station(_Base):
         return f"<Station {self.code}>"  # pragma: no cover
 
 
-class ParticipatingStation(_Base):
+class ParticipatingStation(_Base):  # type: ignore
     """ParticipatingStation table class."""
 
     __tablename__ = "participating_station"
@@ -112,7 +113,7 @@ class ParticipatingStation(_Base):
 
     __table_args__ = (UniqueConstraint("meteor_id", "station_id"),)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Return a string representation of the row.
         :return: string representation of the row.
@@ -122,7 +123,7 @@ class ParticipatingStation(_Base):
         )  # pragma: no cover
 
 
-def _add_meteor_fields(engine, alter_table) -> None:
+def _add_meteor_fields(engine: Engine, alter_table: bool) -> None:
     """
     Add fields from the trajectory summary avsc schema to the meteor table.
     :param engine: SQLAlchemy engine.
@@ -173,7 +174,13 @@ def _add_meteor_fields(engine, alter_table) -> None:
         print(f"Added column if not exists {field['name']} type {main_type}")
 
 
-def _add_column(engine, table_name, table_class, column, alter_table) -> None:
+def _add_column(
+    engine: Engine,
+    table_name: str,
+    table_class: _Base,  # type: ignore
+    column: Column,
+    alter_table: bool,
+) -> None:
     """
     Add a column to a table and to the model.
     :param engine: SQLAlchemy engine

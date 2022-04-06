@@ -4,18 +4,18 @@ import sys
 import unittest
 from unittest import mock
 
-import gmn_python_api
-import sqlalchemy
+import gmn_python_api  # type: ignore
+import sqlalchemy  # type: ignore
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker  # type: ignore
 
 
 class TestController(unittest.TestCase):
     """Tests for the controller module."""
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down the test."""
         try:
             del sys.modules["gmn_data_store.setup_database"]
@@ -44,7 +44,7 @@ class TestController(unittest.TestCase):
 
         from gmn_data_store.models import _Base
 
-        class Test(_Base):
+        class Test(_Base):  # type: ignore
             """Tests for the controller module."""
 
             __tablename__ = "test"

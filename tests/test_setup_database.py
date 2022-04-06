@@ -2,8 +2,8 @@
 import unittest
 from unittest import mock
 
-import sqlalchemy
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy  # type: ignore
+from sqlalchemy.orm import sessionmaker  # type: ignore
 
 import gmn_data_store.setup_database
 

@@ -2,8 +2,10 @@
 import datetime
 from typing import Any
 from typing import Dict
+from typing import Optional
 
-import gmn_python_api
+import gmn_python_api  # type: ignore
+from sqlalchemy.engine import Engine  # type: ignore
 
 from gmn_data_store import get_engine
 from gmn_data_store import get_session
@@ -17,7 +19,9 @@ from gmn_data_store.models import Station
 _database = get_engine()
 
 
-def create_row(table: _Base, fields: Dict[str, Any], engine=None) -> None:
+def create_row(
+    table: _Base, fields: Dict[str, Any], engine: Optional[Engine] = None
+) -> None:
     """
     Creates a row in a table.
 
@@ -35,7 +39,7 @@ def create_row(table: _Base, fields: Dict[str, Any], engine=None) -> None:
 
 
 def insert_trajectory_summary(
-    trajectory_summary_avro: Dict[str, Any], engine=None
+    trajectory_summary_avro: Dict[str, Any], engine: Optional[Engine] = None
 ) -> None:
     """
     Insert a row into the meteor table using a trajectory summary avro dictionary.

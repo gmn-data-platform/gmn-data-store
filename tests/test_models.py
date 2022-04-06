@@ -3,17 +3,15 @@ import sys
 import unittest
 from unittest import mock
 
-from sqlalchemy import Column
+from sqlalchemy import Column  # type: ignore
 from sqlalchemy import String
 
 
 class TestModels(unittest.TestCase):
     """Tests for the models module."""
 
-    def tearDown(self):
-        """
-        Tear down the test.
-        """
+    def tearDown(self) -> None:
+        """Tear down the test."""
         try:
             del sys.modules["gmn_data_store.setup_database"]
             del sys.modules["gmn_data_store.models"]
