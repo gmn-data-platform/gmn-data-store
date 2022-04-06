@@ -112,7 +112,8 @@ def safety(session: Session) -> None:
     requirements = session.poetry.export_requirements()
     session.install("safety")
 
-    ignore_ids = [44715, 44716, 44717]  # numpy CVE-2021-41495
+    ignore_ids = [44715, 44716, 44717, 47833]  # numpy CVE-2021-41495 and
+    # https://github.com/gmn-data-platform/gmn-python-api/issues/111
     ignored = [f"--ignore={ignore_id}" for ignore_id in ignore_ids]
     session.run("safety", "check", "--full-report", f"--file={requirements}", *ignored)
 
