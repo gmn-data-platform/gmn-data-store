@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-#
-# Run database-cli command in container
-#
-
-set -euo pipefail
-exec docker exec --interactive --tty  ... "${@}"

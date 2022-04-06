@@ -1,10 +1,13 @@
-*logs*/
+.mypy_cache/
+/.coverage
+/.coverage.*
+/.nox/
+/.python-version
+/.pytype/
+/dist/
+/docs/_build/
+/src/*.egg-info/
 __pycache__/
 
-.env
-
-# Ignore IDE files
+.db/
 .idea/*
-
-/gmn_data_ingestor/avro/trajectory_summary_schema.avro
-/gmn_data_ingestor/extracted_data/

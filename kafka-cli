@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-#
-# Run kafka command in container
-#
-
-set -euo pipefail
-exec docker exec --interactive --tty  kafka-broker "${@}"
