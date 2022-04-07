@@ -16,17 +16,17 @@ GMN Data Store
 .. |Python Version| image:: https://img.shields.io/pypi/pyversions/gmn-data-store
    :target: https://pypi.org/project/gmn-data-store
    :alt: Python Version
-.. |License| image:: https://img.shields.io/pypi/l/gmn-data-store
+.. |License| image:: https://img.shields.io/github/license/gmn-data-platform/gmn-data-store
    :target: https://opensource.org/licenses/MIT
    :alt: License
 .. |Read the Docs| image:: https://img.shields.io/readthedocs/gmn-data-store/latest.svg?label=Read%20the%20Docs
    :target: https://gmn-data-store.readthedocs.io/
    :alt: Read the documentation at https://gmn-data-store.readthedocs.io/
-.. |Tests| image:: https://github.com/rickybassom/gmn-data-store/workflows/Tests/badge.svg
-   :target: https://github.com/rickybassom/gmn-data-store/actions?workflow=Tests
+.. |Tests| image:: https://github.com/gmn-data-platform/gmn-data-store/workflows/Tests/badge.svg
+   :target: https://github.com/gmn-data-platform/gmn-data-store/actions?query=workflow%3ATests+branch%3Amain
    :alt: Tests
-.. |Codecov| image:: https://codecov.io/gh/rickybassom/gmn-data-store/branch/main/graph/badge.svg
-   :target: https://codecov.io/gh/rickybassom/gmn-data-store
+.. |Codecov| image:: https://codecov.io/gh/gmn-data-platform/gmn-data-store/branch/main/graph/badge.svg
+   :target: https://codecov.io/gh/gmn-data-platform/gmn-data-store
    :alt: Codecov
 .. |pre-commit| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
    :target: https://github.com/pre-commit/pre-commit
