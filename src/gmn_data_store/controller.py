@@ -93,7 +93,7 @@ def insert_trajectory_summary(
         else:
             station_id = existing_station.id
 
-        if (
+        if (  # pragma: no cover
             not db_session.query(ParticipatingStation)
             .filter_by(meteor_id=meteor_row.id, station_id=station_id)
             .first()

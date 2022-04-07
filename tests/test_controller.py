@@ -1,6 +1,5 @@
 """Tests for the controller module."""
 import datetime
-import sys
 import unittest
 from unittest import mock
 
@@ -11,18 +10,22 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy.orm import sessionmaker  # type: ignore
 
+import gmn_data_store.controller
+import gmn_data_store.models
+import gmn_data_store.setup_database
+
+
+class Test(gmn_data_store.models._Base):  # type: ignore
+    """Tests for the controller module."""
+
+    __tablename__ = "test"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
 
 class TestController(unittest.TestCase):
     """Tests for the controller module."""
-
-    def tearDown(self) -> None:
-        """Tear down the test."""
-        try:
-            del sys.modules["gmn_data_store.setup_database"]
-            del sys.modules["gmn_data_store.models"]
-            del sys.modules["gmn_data_store.controller"]
-        except KeyError:  # pragma: no cover
-            pass  # pragma: no cover
 
     @mock.patch("gmn_data_store.controller.get_session")
     @mock.patch("gmn_data_store.setup_database.get_engine")
@@ -33,8 +36,6 @@ class TestController(unittest.TestCase):
         Test: That create_row() creates the correct row.
         When: create_row() is called.
         """
-        from gmn_data_store.controller import create_row
-
         engine = sqlalchemy.create_engine("sqlite://", echo=True)
         mock_engine.return_value = engine
         mock_session_maker.return_value = sessionmaker(bind=engine)()
@@ -42,17 +43,36 @@ class TestController(unittest.TestCase):
         expected_row = {"id": 1, "name": "test"}
         engine.execute("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)")
 
-        from gmn_data_store.models import _Base
+        gmn_data_store.controller.create_row(Test, expected_row)
 
-        class Test(_Base):  # type: ignore
-            """Tests for the controller module."""
+        self.assertEqual(
+            list(expected_row.values()),
+            list(engine.execute("SELECT * FROM test").fetchall()[0]),
+        )
 
-            __tablename__ = "test"
+    @mock.patch("gmn_data_store.controller.get_session")
+    @mock.patch("gmn_data_store.get_engine")
+    @mock.patch("gmn_data_store.setup_database.get_engine")
+    def test_create_row_already_exists(
+        self,
+        mock_engine: mock.Mock,
+        mock_engine2: mock.Mock,
+        mock_session_maker: mock.Mock,
+    ) -> None:
+        """
+        Test: That create_row() doesn't create a new row if the id already exists.
+        When: create_row() is called.
+        """
+        engine = sqlalchemy.create_engine("sqlite://", echo=True)
+        mock_engine.return_value = engine
+        mock_engine2.return_value = engine
+        mock_session_maker.return_value = sessionmaker(bind=engine)()
 
-            id = Column(Integer, primary_key=True)
-            name = Column(String)
+        expected_row = {"id": 1, "name": "test"}
+        engine.execute("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)")
+        engine.execute("INSERT INTO test VALUES (1, 'test')")
 
-        create_row(Test, expected_row)
+        gmn_data_store.controller.create_row(Test, expected_row)
 
         self.assertEqual(
             list(expected_row.values()),
@@ -78,17 +98,13 @@ class TestController(unittest.TestCase):
             == ["null", {"type": "long", "logicalType": "timestamp-micros"}]
         ]
 
-        from gmn_data_store.controller import insert_trajectory_summary
-        from gmn_data_store.setup_database import setup_database
-
-        engine = setup_database()
+        engine = gmn_data_store.setup_database.setup_database()
 
         expected_row = data_frame.iloc[0].to_dict()
-        insert_trajectory_summary(expected_row, engine)
+        gmn_data_store.controller.insert_trajectory_summary(expected_row, engine)
 
         # Extract fields that should be in the Meteor table
         expected_row_db = {}
-        import gmn_data_store.models
 
         for k in set(gmn_data_store.models.Meteor.__table__.columns.keys()) - set(
             gmn_data_store.models._FIELDS_IN_METEOR_TABLE_NOT_TRAJECTORY_SUMMARY
@@ -141,16 +157,13 @@ class TestController(unittest.TestCase):
             avro_compatible=True,
         )
 
-        from gmn_data_store.controller import insert_trajectory_summary
-        from gmn_data_store.setup_database import setup_database
-
-        engine = setup_database()
+        engine = gmn_data_store.setup_database.setup_database()
         expected_row = data_frame.iloc[0].to_dict()
 
         # Test adding an existing station
         engine.execute("INSERT INTO station (code) VALUES ('TEST')")
         expected_row["participating_stations"].append("TEST")
-        insert_trajectory_summary(expected_row, engine)
+        gmn_data_store.controller.insert_trajectory_summary(expected_row, engine)
 
         # Test if TEST only appears once in the station table
         self.assertEqual(

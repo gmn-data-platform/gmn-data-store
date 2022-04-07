@@ -149,7 +149,7 @@ def _add_meteor_fields(engine: Engine, alter_table: bool) -> None:
             continue
 
         nullable = False
-        if field["type"][0] == "null":
+        if field["type"][0] == "null":  # pragma: no cover
             nullable = True
 
         logical_type = None
@@ -157,7 +157,7 @@ def _add_meteor_fields(engine: Engine, alter_table: bool) -> None:
         # Special case for timestamp values
         if type(field["type"][1]) == dict:
             main_type = field["type"][1]["type"]
-            if "logicalType" in field["type"][1]:
+            if "logicalType" in field["type"][1]:  # pragma: no cover
                 logical_type = field["type"][1]["logicalType"]
         else:
             main_type = field["type"][1]
