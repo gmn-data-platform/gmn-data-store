@@ -1,0 +1,19 @@
+version: "3.3"
+
+services:
+  gmn-data-store-init:
+    image: python:3.9
+    restart: "no"
+    entrypoint: /bin/bash
+    command: -c "python -m pip install /gmn-data-store && gmn-data-store setup-database"
+    volumes:
+      - ./:/gmn-data-store:Z
+      - ./.db:/root/.gmn_data_store:Z
+    networks:
+      - gmn_data_platform_network
+    profiles:
+      - init
+
+networks:
+  gmn_data_platform_network:
+    name: gmn_data_platform_network
