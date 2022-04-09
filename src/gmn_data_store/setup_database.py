@@ -34,8 +34,6 @@ def seed_data(engine: Engine) -> None:
     :return: None.
     """
     initial_iau_showers = list(get_iau_showers().values())
-    print(f"Initialising gmn-data-store with IAU showers {initial_iau_showers}")
-
     for fields in initial_iau_showers:
         controller.create_row(IAUShower, fields, engine=engine)
 

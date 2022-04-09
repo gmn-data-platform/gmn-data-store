@@ -15,7 +15,6 @@ def get_engine() -> Engine:
     Create an engine for the database.
     :return: The engine for the database.
     """
-    print(_DB_CONNECTION_URI)
     return create_engine(_DB_CONNECTION_URI)
 
 

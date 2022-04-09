@@ -171,7 +171,6 @@ def _add_meteor_fields(engine: Engine, alter_table: bool) -> None:
             nullable=nullable,
         )
         _add_column(engine, "meteor", Meteor, column, alter_table)
-        print(f"Added column if not exists {field['name']} type {main_type}")
 
 
 def _add_column(
@@ -191,24 +190,22 @@ def _add_column(
     """
     column_name = column.compile(dialect=engine.dialect)
     column_type = column.type.compile(engine.dialect)
-    try:
-        if hasattr(table_class, str(column_name)):
-            return
+    if hasattr(table_class, str(column_name)):
+        return
 
-        if alter_table:
+    if alter_table:
+        try:
             engine.execute(
                 "ALTER TABLE %s ADD COLUMN %s %s"
                 % (table_name, column_name, column_type)
             )
-
-        setattr(table_class, str(column_name), column)
-        print(f"Added column if not exists {column_name} type {column_type}")
-    except Exception as e:
-        print(e)
-        print(
-            f"Couldn't create column {column_name}, it could already exist in the "
-            f"database."
-        )
+        except Exception as e:
+            print(e)
+            print(
+                f"Couldn't create column {column_name}, it could already exist in the "
+                f"database."
+            )
+    setattr(table_class, str(column_name), column)
 
 
 engine = get_engine()

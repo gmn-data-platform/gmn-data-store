@@ -7,12 +7,16 @@ services:
     entrypoint: /bin/bash
     command: -c "python -m pip install /gmn-data-store && gmn-data-store setup-database"
     volumes:
-      - ./:/gmn-data-store:Z
-      - ./.db:/root/.gmn_data_store:Z
+      - ./:/gmn-data-store
+      - gmn_data_store:/root/.gmn_data_store
     networks:
       - gmn_data_platform_network
     profiles:
       - init
+
+volumes:
+  gmn_data_store:
+    external: true
 
 networks:
   gmn_data_platform_network:
