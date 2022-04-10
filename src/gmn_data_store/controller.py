@@ -65,7 +65,7 @@ def insert_trajectory_summary(
             meteor_fields[field] = trajectory_summary_avro[field]
 
             # Special case for converting epoch microseconds to Datetime
-            if field in timestamp_fields:
+            if field in timestamp_fields and type(meteor_fields[field]) == int:
                 meteor_fields[field] = datetime.datetime.fromtimestamp(
                     meteor_fields[field] / 1e6
                 )
