@@ -48,6 +48,9 @@ def insert_trajectory_summary(
      conforms to the official avsc schema.
     :return: None.
     """
+    if not engine:  # pragma: no cover
+        engine = get_engine()
+
     db_session = get_session(engine)
     schema = gmn_python_api.get_trajectory_summary_avro_schema()
     timestamp_fields = [
