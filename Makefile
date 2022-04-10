@@ -10,7 +10,7 @@ init_all_services:
 	docker volume create --driver local --opt type=none --opt device=$(DB_DIR) --opt o=bind gmn_data_store
 	docker-compose --profile=init up --abort-on-container-exit
 
-stop_database_services:
+stop_all_services:
 	echo "Stopping database services"
 	docker-compose down --remove-orphans
 
