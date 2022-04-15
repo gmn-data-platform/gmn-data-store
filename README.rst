@@ -37,31 +37,29 @@ GMN Data Store
 
 `Global Meteor Network`_ (GMN) database models, controllers and scripts.
 
---------
-
-* TODO
-
 
 Requirements
 ------------
 
-* TODO
+* Python 3.7, 3.8, 3.9 or 3.10
 
 
 Installation
 ------------
 
-You can install *GMN Data Store* via pip_ from PyPI_:
+You can install *GMN Data Store* via pip_ from `PyPI`_:
 
 .. code:: console
 
    $ pip install gmn-data-store
 
+Or for the latest development code, through TestPyPI_ or directly from GitHub_ via pip_:
 
-Usage
------
+.. code:: console
 
-Please see the `Command-line Reference <Usage_>`_ for details.
+   $ pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple gmn-data-store==<version>
+   Or
+   $ pip install git+https://github.com/gmn-data-platform/gmn-data-store
 
 
 Contributing
@@ -93,7 +91,8 @@ Credits
 .. _@cjolowicz: https://github.com/cjolowicz
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _MIT license: https://opensource.org/licenses/MIT
-.. _PyPI: https://pypi.org/
+.. _PyPI: https://pypi.org/project/gmn-data-store/
+.. _TestPyPI: https://test.pypi.org/project/gmn-data-store/
 .. _Hypermodern Python Cookiecutter: https://github.com/cjolowicz/cookiecutter-hypermodern-python
 .. _file an issue: https://github.com/rickybassom/gmn-data-store/issues
 .. _pip: https://pip.pypa.io/
@@ -101,3 +100,4 @@ Credits
 .. _Contributor Guide: CONTRIBUTING.rst
 .. _Usage: https://gmn-data-store.readthedocs.io/en/latest/usage.html
 .. _Global Meteor Network: https://globalmeteornetwork.org/
+.. _GitHub: https://github.com/gmn-data-platform/gmn-data-store
