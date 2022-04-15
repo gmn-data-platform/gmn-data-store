@@ -16,7 +16,7 @@ class TestModels(unittest.TestCase):
             del sys.modules["gmn_data_store.setup_database"]
             del sys.modules["gmn_data_store.models"]
             del sys.modules["gmn_data_store.controller"]
-        except KeyError:
+        except KeyError:  # pragma: no cover
             pass
 
     @mock.patch("gmn_data_store._DB_CONNECTION_URI", "sqlite://")

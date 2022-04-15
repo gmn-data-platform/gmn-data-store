@@ -1,5 +1,6 @@
 """Tests for the controller module."""
 import datetime
+import sys
 import unittest
 from unittest import mock
 
@@ -26,6 +27,28 @@ class Test(gmn_data_store.models._Base):  # type: ignore
 
 class TestController(unittest.TestCase):
     """Tests for the controller module."""
+
+    def tearDown(self) -> None:
+        """Tear down the test."""
+        try:
+            del sys.modules["gmn_data_store.setup_database"]
+        except KeyError:  # pragma: no cover
+            pass
+
+        try:
+            del sys.modules["gmn_data_store.models"]
+        except KeyError:  # pragma: no cover
+            pass
+
+        try:
+            del sys.modules["gmn_data_store.controller"]
+        except KeyError:  # pragma: no cover
+            pass
+
+        try:
+            del sys.modules["gmn_data_store"]
+        except KeyError:  # pragma: no cover
+            pass
 
     @mock.patch("gmn_data_store.controller.get_session")
     @mock.patch("gmn_data_store.setup_database.get_engine")
@@ -72,7 +95,7 @@ class TestController(unittest.TestCase):
         engine.execute("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)")
         engine.execute("INSERT INTO test VALUES (1, 'test')")
 
-        gmn_data_store.controller.create_row(Test, expected_row)
+        gmn_data_store.controller.create_row(Test, expected_row, engine)
 
         self.assertEqual(
             list(expected_row.values()),
@@ -86,6 +109,8 @@ class TestController(unittest.TestCase):
          table from a trajectory summary json.
         When: insert_trajectory_summary() is called.
         """
+        import gmn_data_store.setup_database
+
         data_frame = gmn_python_api.read_trajectory_summary_as_dataframe(
             gmn_python_api.trajectory_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
             avro_compatible=True,
@@ -152,6 +177,10 @@ class TestController(unittest.TestCase):
          table from a trajectory summary json.
         When: insert_trajectory_summary() is called.
         """
+        import gmn_data_store.setup_database
+        import gmn_data_store.controller
+        import gmn_data_store.models
+
         data_frame = gmn_python_api.read_trajectory_summary_as_dataframe(
             gmn_python_api.trajectory_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
             avro_compatible=True,
@@ -217,6 +246,9 @@ class TestController(unittest.TestCase):
          table.
         When: insert_trajectory_summary() is called with an existing station.
         """
+        import gmn_data_store.setup_database
+        import gmn_data_store.controller
+
         data_frame = gmn_python_api.read_trajectory_summary_as_dataframe(
             gmn_python_api.trajectory_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
             avro_compatible=True,

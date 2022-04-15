@@ -1073,6 +1073,17 @@ pymysql = ["pymysql (<1)", "pymysql"]
 sqlcipher = ["sqlcipher3-binary"]
 
 [[package]]
+name = "sqlalchemy-views"
+version = "0.3.1"
+description = "Adds CreateView and DropView constructs to SQLAlchemy"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+sqlalchemy = ">=1.0.0"
+
+[[package]]
 name = "stevedore"
 version = "3.5.0"
 description = "Manage dynamic plugins for Python applications"
@@ -1230,7 +1241,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.1"
-content-hash = "cf2f27e4682e409c9331dea430b431dffd5cc39f14c505bf50924b19fbf599cd"
+content-hash = "74dd9e68fba37320dbbd7e67756a5751512a38c1916f2825bc304a78ef8f9709"
 
 [metadata.files]
 alabaster = [
@@ -1877,6 +1888,10 @@ sqlalchemy = [
     {file = "SQLAlchemy-1.4.35-cp39-cp39-win32.whl", hash = "sha256:ecc81336b46e31ae9c9bdfa220082079914e31a476d088d3337ecf531d861228"},
     {file = "SQLAlchemy-1.4.35-cp39-cp39-win_amd64.whl", hash = "sha256:53c7469b86a60fe2babca4f70111357e6e3d5150373bc85eb3b914356983e89a"},
     {file = "SQLAlchemy-1.4.35.tar.gz", hash = "sha256:2ffc813b01dc6473990f5e575f210ca5ac2f5465ace3908b78ffd6d20058aab5"},
+]
+sqlalchemy-views = [
+    {file = "sqlalchemy-views-0.3.1.tar.gz", hash = "sha256:5aeaaa3be005ead283e4fe189dd65d2c9ccfdf0212e19d6647b8589332d7e31e"},
+    {file = "sqlalchemy_views-0.3.1-py3-none-any.whl", hash = "sha256:de2b714274b3f32da8a496571848ff75ae3c9cb5145195e402fa1bb896dd400f"},
 ]
 stevedore = [
     {file = "stevedore-3.5.0-py3-none-any.whl", hash = "sha256:a547de73308fd7e90075bb4d301405bebf705292fa90a90fc3bcf9133f58616c"},
