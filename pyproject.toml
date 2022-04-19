@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gmn-data-store"
-version = "0.0.0"
+version = "0.0.1"
 description = "GMN Data Store"
 authors = ["Ricky Bassom <rickybas12@gmail.com>"]
 license = "MIT"
