@@ -17,7 +17,7 @@ import gmn_data_store.setup_database
 
 
 class Test(gmn_data_store.models._Base):  # type: ignore
-    """Tests for the controller module."""
+    """Test model for inserting and querying unit test data."""
 
     __tablename__ = "test"
 
