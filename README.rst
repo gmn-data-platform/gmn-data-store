@@ -39,72 +39,8 @@ GMN Data Store
 
 This project stores GMN meteor data in a relational SQLite database where the database schema is generated using the gmn-python-api_ library. The `GMN Data Platform`_ project aims to deploy this on the GMN server. The Python package provided here is used by the `GMN Data Store Ingestion`_ to add/update data in the database. A Datasette_ instance is run for the `GMN Data Portal`_ and it accesses this data to provide user-facing data select querying and a web interface to view the data.
 
-Database entity relationship diagram:
+`Database entity relationship diagram`_
 
-```mermaid
-erDiagram
-
-  iau_shower {
-    INTEGER id
-    VARCHAR code
-    VARCHAR name
-    DATETIME created_at
-    DATETIME updated_at
-  }
-
-  station {
-    INTEGER id
-    VARCHAR code
-    DATETIME created_at
-    DATETIME updated_at
-  }
-
-  meteor {
-    VARCHAR id
-    DATETIME created_at
-    DATETIME updated_at
-    VARCHAR schema_version
-    INTEGER iau_shower_id
-    FLOAT beginning_julian_date
-    DATETIME beginning_utc_time
-    FLOAT sol_lon_deg
-    FLOAT app_lst_deg
-    FLOAT rageo_deg
-    CUT_METEOR_PROPERTIES other_meteor_properties
-  }
-
-  participating_station {
-    INTEGER id
-    DATETIME created_at
-    DATETIME updated_at
-    VARCHAR meteor_id
-    INTEGER station_id
-  }
-
-  meteor_summary {
-    VARCHAR unique_trajectory_identifier
-    FLOAT beginning_julian_date
-    DATETIME beginning_utc_time
-    INTEGER iau_no
-    VARCHAR iau_code
-    INT num_stat
-    ARRAY participating_stations
-    VARCHAR schema_version
-    FLOAT sol_lon_deg
-    FLOAT app_lst_deg
-    FLOAT rageo_deg
-    CUT_METEOR_PROPERTIES other_meteor_properties
-  }
-
-  iau_shower ||--o{ meteor : "iau_shower_id"
-
-  station ||--o{ participating_station : "station_id"
-
-  meteor ||--o{ participating_station : "meteor_id"
-
-````
-
-The tables are generated using the gmn_python.meteor_summary_schema.get_meteor_summary_avro_schema() function. meteor_summary is a SQLite database view and provides a flat view of all the other meteor related tables. The view includes columns similar to `GMN Data Directory`_ CSVs. The meteor_summary view can be selected using functions_ provided in the gmn_python_api to load meteor data into Pandas_ DataFrames.
 
 The Python package gmn-data-store provides functions for setting up the database, querying data in the database and inserting data into the database. The main insert function is insert_trajectory_summary which takes an AVRO formatted JSON dictionary of meteor trajectory data (more info in the `gmn-python-api docs`_) and inserts the data into the database. The `GMN Data Store Ingestion`_ project inserts trajectory summary Kafka messages using this function.
 
@@ -184,8 +120,7 @@ Credits
 .. _GMN Data Portal: https://github.com/gmn-data-platform/gmn-data-endpoints/tree/main/services/gmn_data_portal
 .. _GMN Data Store Ingestion: https://github.com/gmn-data-platform/gmn-data-store-ingestion
 .. _GMN Data Platform: https://github.com/gmn-data-platform
-.. _GMN Data Directory: https://globalmeteornetwork.org/data/
-.. _Pandas: https://pandas.pydata.org/
 .. _gmn-python-api docs: https://gmn-python-api.readthedocs.io/en/latest/search.html?q=avro&check_keywords=yes&area=default
 .. _functions: https://gmn-python-api.readthedocs.io/en/latest/autoapi/gmn_python_api/meteor_summary_reader/index.html#gmn_python_api.meteor_summary_reader.read_meteor_summary_csv_as_dataframe
 .. _Makefile: https://github.com/gmn-data-platform/gmn-data-store/blob/main/Makefile
+.. _Database entity relationship diagram: https://github.com/gmn-data-platform/gmn-data-store/blob/main/database_schema.md
