@@ -37,10 +37,9 @@ GMN Data Store
 
 `Global Meteor Network`_ (GMN) database models, controllers and scripts.
 
-This project stores GMN meteor data in a relational SQLite database where the database schema is generated using the gmn-python-api_ library. The `GMN Data Platform`_ project aims to deploy this on the GMN server. The Python package provided here is used by the `GMN Data Store Ingestion`_ to add/update data in the database. A Datasette_ instance is run for the `GMN Data Portal`_ and it accesses this data to provide user-facing data select querying and a web interface to view the data.
+This project stores GMN meteor data in a relational SQLite database where the database schema is generated using the gmn-python-api_ library. The Python package provided here is used by the `GMN Data Store Ingestion`_ to add/update data in the database. A Datasette_ instance is run for the `GMN Data Portal`_ and it accesses this data to provide user-facing data select querying and a web interface to view the data.
 
 `Database entity relationship diagram`_
-
 
 The Python package gmn-data-store provides functions for setting up the database, querying data in the database and inserting data into the database. The main insert function is insert_trajectory_summary which takes an AVRO formatted JSON dictionary of meteor trajectory data (more info in the `gmn-python-api docs`_) and inserts the data into the database. The `GMN Data Store Ingestion`_ project inserts trajectory summary Kafka messages using this function.
 
