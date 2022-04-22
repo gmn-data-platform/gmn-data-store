@@ -27,6 +27,7 @@ def create_row(
 
     :param table: The table to add the row to.
     :param fields: A dictionary of fields to add to the table.
+
     :return: None
     """
     db_session = get_session(engine)
@@ -46,6 +47,7 @@ def insert_trajectory_summary(
 
     :param trajectory_summary: A trajectory summary avro formatted dictionary that
      conforms to the official avsc schema.
+
     :return: None.
     """
     if not engine:  # pragma: no cover

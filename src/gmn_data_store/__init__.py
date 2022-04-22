@@ -16,6 +16,7 @@ _DB_CONNECTION_URI = f"sqlite:///{_DB_DIRECTORY}"
 def get_engine() -> Engine:
     """
     Create an engine for the database.
+
     :return: The engine for the database.
     """
     engine = create_engine(_DB_CONNECTION_URI)
@@ -26,6 +27,7 @@ def get_engine() -> Engine:
 def get_session(engine: Engine) -> Session:
     """
     Generate sessions for making database queries.
+
     :return: A session for the database.
     """
     return sessionmaker(bind=engine)()
@@ -36,8 +38,10 @@ def _pragma_on_connect(
 ) -> None:
     """
     Enable Write-Ahead Logging for concurrent access.
+
     :param dbapi_connection: The database connection.
     :param connection_record: The connection record.
+
     :return: None.
     """
     cursor = dbapi_connection.cursor()

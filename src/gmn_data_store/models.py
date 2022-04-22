@@ -51,6 +51,7 @@ class Meteor(_Base):  # type: ignore
     def __repr__(self) -> str:
         """
         Return a string representation of the row.
+
         :return: string representation of the row.
         """
         return f"<Meteor {self.id}>"  # pragma: no cover
@@ -71,6 +72,7 @@ class IAUShower(_Base):  # type: ignore
     def __repr__(self) -> str:
         """
         Return a string representation of the row.
+
         :return: string representation of the row.
         """
         return (
@@ -92,6 +94,7 @@ class Station(_Base):  # type: ignore
     def __repr__(self) -> str:
         """
         Return a string representation of the row.
+
         :return: string representation of the row.
         """
         return f"<Station {self.code}>"  # pragma: no cover
@@ -116,6 +119,7 @@ class ParticipatingStation(_Base):  # type: ignore
     def __repr__(self) -> str:
         """
         Return a string representation of the row.
+
         :return: string representation of the row.
         """
         return (
@@ -126,7 +130,9 @@ class ParticipatingStation(_Base):  # type: ignore
 def _add_meteor_fields(engine: Engine, alter_table: bool) -> None:
     """
     Add fields from the trajectory summary avsc schema to the meteor table.
+
     :param engine: SQLAlchemy engine.
+
     :return: None.
     """
     avsc = get_trajectory_summary_avro_schema()
@@ -182,10 +188,12 @@ def _add_column(
 ) -> None:
     """
     Add a column to a table and to the model.
-    :param engine: SQLAlchemy engine
-    :param table_name: Name of the table
-    :param table_class: SQLAlchemy model class
-    :param column: SQLAlchemy column
+
+    :param engine: SQLAlchemy engine.
+    :param table_name: Name of the table.
+    :param table_class: SQLAlchemy model class.
+    :param column: SQLAlchemy column.
+
     :return: None
     """
     column_name = column.compile(dialect=engine.dialect)

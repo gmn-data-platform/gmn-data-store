@@ -35,8 +35,10 @@ def setup_database() -> Engine:
 def create_meteor_summary_view(engine: Engine) -> None:
     """
     Create a flat meteor summary view from the related meteor tables.
+
     :param engine: SQLAlchemy engine.
     :param meteor_columns: List of columns from the meteor table.
+
     :return: None.
     """
     special_select_fields = {
@@ -78,6 +80,7 @@ def seed_data(engine: Engine) -> None:
     Seed data into database.
 
     :param engine: SQLAlchemy engine.
+
     :return: None.
     """
     initial_iau_showers = list(get_iau_showers().values())
