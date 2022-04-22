@@ -78,6 +78,7 @@ To create the .db SQLite file and gmn_data_store Docker volume:
 
    $ make DB_DIR="<local target dir>" init_all_services
 
+See the Makefile for more provided tasks.
 
 Refer to the `docs API reference page`_ for function and variable definitions.
 
