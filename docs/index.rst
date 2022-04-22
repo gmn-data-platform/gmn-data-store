@@ -34,3 +34,4 @@
 .. _functions: https://gmn-python-api.readthedocs.io/en/latest/autoapi/gmn_python_api/meteor_summary_reader/index.html#gmn_python_api.meteor_summary_reader.read_meteor_summary_csv_as_dataframe
 .. _Makefile: https://github.com/gmn-data-platform/gmn-data-store/blob/main/Makefile
 .. _Database entity relationship diagram: https://github.com/gmn-data-platform/gmn-data-store/blob/main/database_schema.md
+.. _example: https://github.com/gmn-data-platform/gmn-data-store-ingestion/blob/2104c97d767a9ef82f0f9a1948bd25c2f7712b01/services/kafka_database_sink/docker-compose.yaml#L11

@@ -43,7 +43,7 @@ This project stores GMN meteor data in a relational SQLite database where the da
 
 The Python package gmn-data-store provides functions for setting up the database, querying data in the database and inserting data into the database. The main insert function is insert_trajectory_summary which takes an AVRO formatted JSON dictionary of meteor trajectory data (more info in the `gmn-python-api docs`_) and inserts the data into the database. The `GMN Data Store Ingestion`_ project inserts trajectory summary Kafka messages using this function.
 
-A Makefile_ is also provided to initially setup the database using Docker. Use the init_all_services Makefile task to create the .db file in the gmn_data_store Docker volume. By default the gmn-data-store package gets the .db file from ~/.gmn_data_store/gmn_data_store.db so mount the volume at ~/gmn_data_store to use the Python package with the .db file in the Docker volume.
+A Makefile_ is also provided to initially setup the database using Docker. Use the init_all_services Makefile task to create the .db file and the gmn_data_store Docker volume. By default the gmn-data-store package gets the .db file from ~/.gmn_data_store/gmn_data_store.db so mount the volume at ~/gmn_data_store to use the Python package with the .db file in the Docker volume (example_).
 
 Requirements
 ------------
@@ -71,6 +71,13 @@ Or for the latest development code, through TestPyPI_ or directly from GitHub_ v
 
 Usage
 -----
+
+To create the .db SQLite file and gmn_data_store Docker volume:
+
+.. code:: console
+
+   $ make DB_DIR="<local target dir>" init_all_services
+
 
 Refer to the `docs API reference page`_ for function and variable definitions.
 
@@ -123,3 +130,4 @@ Credits
 .. _functions: https://gmn-python-api.readthedocs.io/en/latest/autoapi/gmn_python_api/meteor_summary_reader/index.html#gmn_python_api.meteor_summary_reader.read_meteor_summary_csv_as_dataframe
 .. _Makefile: https://github.com/gmn-data-platform/gmn-data-store/blob/main/Makefile
 .. _Database entity relationship diagram: https://github.com/gmn-data-platform/gmn-data-store/blob/main/database_schema.md
+.. _example: https://github.com/gmn-data-platform/gmn-data-store-ingestion/blob/2104c97d767a9ef82f0f9a1948bd25c2f7712b01/services/kafka_database_sink/docker-compose.yaml#L11
