@@ -4,7 +4,7 @@ import sys
 import unittest
 from unittest import mock
 
-import gmn_python_api  # type: ignore
+import gmn_python_api
 import sqlalchemy  # type: ignore
 from sqlalchemy import Column
 from sqlalchemy import Integer
@@ -111,15 +111,16 @@ class TestController(unittest.TestCase):
         """
         import gmn_data_store.setup_database
 
-        data_frame = gmn_python_api.read_trajectory_summary_as_dataframe(
-            gmn_python_api.trajectory_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
+        data_frame = gmn_python_api.meteor_summary_reader.read_meteor_summary_csv_as_dataframe(
+            gmn_python_api.meteor_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
             avro_compatible=True,
+            csv_data_directory_format=True,
         )
-        schema = gmn_python_api.get_trajectory_summary_avro_schema()
+        schema = gmn_python_api.meteor_summary_schema.get_meteor_summary_avro_schema()
         timestamp_fields = [
-            item["name"]
+            item["name"]  # type: ignore
             for item in schema["fields"]
-            if item["type"]
+            if item["type"]  # type: ignore
             == ["null", {"type": "long", "logicalType": "timestamp-micros"}]
         ]
 
@@ -181,16 +182,17 @@ class TestController(unittest.TestCase):
         import gmn_data_store.controller
         import gmn_data_store.models
 
-        data_frame = gmn_python_api.read_trajectory_summary_as_dataframe(
-            gmn_python_api.trajectory_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
+        data_frame = gmn_python_api.meteor_summary_reader.read_meteor_summary_csv_as_dataframe(
+            gmn_python_api.meteor_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
             avro_compatible=True,
             avro_long_beginning_utc_time=False,
+            csv_data_directory_format=True,
         )
-        schema = gmn_python_api.get_trajectory_summary_avro_schema()
+        schema = gmn_python_api.meteor_summary_schema.get_meteor_summary_avro_schema()
         timestamp_fields = [
-            item["name"]
+            item["name"]  # type: ignore
             for item in schema["fields"]
-            if item["type"]
+            if item["type"]  # type: ignore
             == ["null", {"type": "long", "logicalType": "timestamp-micros"}]
         ]
 
@@ -249,9 +251,10 @@ class TestController(unittest.TestCase):
         import gmn_data_store.setup_database
         import gmn_data_store.controller
 
-        data_frame = gmn_python_api.read_trajectory_summary_as_dataframe(
-            gmn_python_api.trajectory_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
+        data_frame = gmn_python_api.meteor_summary_reader.read_meteor_summary_csv_as_dataframe(
+            gmn_python_api.meteor_summary_schema._MODEL_TRAJECTORY_SUMMARY_FILE_PATH,
             avro_compatible=True,
+            csv_data_directory_format=True,
         )
 
         engine = gmn_data_store.setup_database.setup_database()

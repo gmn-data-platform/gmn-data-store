@@ -1,7 +1,7 @@
 """This module stores the database models."""
 from datetime import datetime
 
-from gmn_python_api import get_trajectory_summary_avro_schema  # type: ignore
+from gmn_python_api import get_meteor_summary_avro_schema  # type: ignore
 from sqlalchemy import BigInteger  # type: ignore
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -135,7 +135,7 @@ def _add_meteor_fields(engine: Engine, alter_table: bool) -> None:
 
     :return: None.
     """
-    avsc = get_trajectory_summary_avro_schema()
+    avsc = get_meteor_summary_avro_schema()
     avro_type_to_sqlalchemy_type_map = {
         "null": None,
         "long": BigInteger,

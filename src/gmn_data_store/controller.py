@@ -4,7 +4,7 @@ from typing import Any
 from typing import Dict
 from typing import Optional
 
-import gmn_python_api  # type: ignore
+import gmn_python_api
 from sqlalchemy.engine import Engine  # type: ignore
 
 from gmn_data_store import get_engine
@@ -54,11 +54,12 @@ def insert_trajectory_summary(
         engine = get_engine()
 
     db_session = get_session(engine)
-    schema = gmn_python_api.get_trajectory_summary_avro_schema()
+    schema = gmn_python_api.meteor_summary_schema.get_meteor_summary_avro_schema()
     timestamp_fields = [
-        item["name"]
+        item["name"]  # type: ignore
         for item in schema["fields"]
-        if item["type"] == ["null", {"type": "long", "logicalType": "timestamp-micros"}]
+        if item["type"]  # type: ignore
+        == ["null", {"type": "long", "logicalType": "timestamp-micros"}]
     ]
 
     meteor_fields = {}  # fields to add to Meteor table

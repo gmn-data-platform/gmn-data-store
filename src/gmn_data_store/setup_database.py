@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """This module creates database and setups up tables."""
-from gmn_python_api import get_trajectory_summary_avro_schema  # type: ignore
-from gmn_python_api.iau_showers import get_iau_showers  # type: ignore
+from gmn_python_api import get_meteor_summary_avro_schema  # type: ignore
+from gmn_python_api.iau_showers import get_iau_showers
 from sqlalchemy import Table  # type: ignore
 from sqlalchemy import text
 from sqlalchemy.engine import Engine  # type: ignore
@@ -48,7 +48,7 @@ def create_meteor_summary_view(engine: Engine) -> None:
         "num_stat": "count(station.id) AS num_stat",
         "participating_stations": "GROUP_CONCAT(station.code) AS participating_stations",
     }
-    schema = get_trajectory_summary_avro_schema()
+    schema = get_meteor_summary_avro_schema()
     columns = []
     for field in schema["fields"]:
         if field["name"] in special_select_fields:

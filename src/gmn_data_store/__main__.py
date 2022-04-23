@@ -1,16 +1,16 @@
 """Command-line interface."""
-import click  # type: ignore
+import click
 
 from gmn_data_store.setup_database import setup_database as _setup_database
 
 
-@click.group()  # type: ignore
-@click.version_option()  # type: ignore
+@click.group()
+@click.version_option()
 def main() -> None:
     """GMN Data Store."""
 
 
-@main.command()  # type: ignore
+@main.command()
 def setup_database() -> None:
     """Setup database."""
     _setup_database()  # pragma: no cover
