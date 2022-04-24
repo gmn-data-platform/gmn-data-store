@@ -46,7 +46,7 @@ def insert_trajectory_summary(
     """
     Insert a row into the meteor table using a trajectory summary avro dictionary.
 
-    :param trajectory_summary: A trajectory summary avro formatted dictionary that
+    :param trajectory_summary_avro: A trajectory summary avro formatted dictionary that
      conforms to the official avsc schema.
     :param engine: SQLAlchemy engine.
 
