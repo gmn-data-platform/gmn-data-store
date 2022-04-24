@@ -132,6 +132,8 @@ def _add_meteor_fields(engine: Engine, alter_table: bool) -> None:
     Add fields from the trajectory summary avsc schema to the meteor table.
 
     :param engine: SQLAlchemy engine.
+    :param alter_table: If True, add real fields to the database. If False, fields will
+     just be added to SQLAlchemy Python model classes.
 
     :return: None.
     """
@@ -193,6 +195,8 @@ def _add_column(
     :param table_name: Name of the table.
     :param table_class: SQLAlchemy model class.
     :param column: SQLAlchemy column.
+    :param alter_table: If True, add real fields to the database. If False, fields will
+     just be added to SQLAlchemy Python model classes.
 
     :return: None
     """

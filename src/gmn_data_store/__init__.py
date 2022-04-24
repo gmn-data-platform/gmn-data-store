@@ -28,6 +28,8 @@ def get_session(engine: Engine) -> Session:
     """
     Generate sessions for making database queries.
 
+    :param engine: SQLAlchemy engine.
+
     :return: A session for the database.
     """
     return sessionmaker(bind=engine)()

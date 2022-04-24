@@ -27,6 +27,7 @@ def create_row(
 
     :param table: The table to add the row to.
     :param fields: A dictionary of fields to add to the table.
+    :param engine: SQLAlchemy engine.
 
     :return: None
     """
@@ -47,6 +48,7 @@ def insert_trajectory_summary(
 
     :param trajectory_summary: A trajectory summary avro formatted dictionary that
      conforms to the official avsc schema.
+    :param engine: SQLAlchemy engine.
 
     :return: None.
     """

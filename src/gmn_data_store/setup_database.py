@@ -37,7 +37,6 @@ def create_meteor_summary_view(engine: Engine) -> None:
     Create a flat meteor summary view from the related meteor tables.
 
     :param engine: SQLAlchemy engine.
-    :param meteor_columns: List of columns from the meteor table.
 
     :return: None.
     """
