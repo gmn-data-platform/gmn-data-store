@@ -63,7 +63,8 @@ def create_meteor_summary_view(engine: Engine) -> None:
       LEFT JOIN iau_shower on meteor.iau_shower_id = iau_shower.id
       LEFT JOIN participating_station ON participating_station.meteor_id = meteor.id
       LEFT JOIN station ON participating_station.station_id = station.id
-    GROUP BY meteor.id"""
+    GROUP BY meteor.id
+    ORDER BY beginning_utc_time DESC"""
 
     view = Table("meteor_summary", _Base.metadata)
     drop_view = DropView(view, if_exists=True)
