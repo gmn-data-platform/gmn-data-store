@@ -43,9 +43,11 @@ class Meteor(_Base):  # type: ignore
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    schema_version = Column(String, nullable=False)
+    schema_version = Column(String, nullable=False, index=True)
 
-    iau_shower_id = Column(Integer, ForeignKey("iau_shower.id"), nullable=True)
+    iau_shower_id = Column(
+        Integer, ForeignKey("iau_shower.id"), nullable=True, index=True
+    )
     iau_shower = relationship("IAUShower")
 
     def __repr__(self) -> str:
@@ -62,8 +64,8 @@ class IAUShower(_Base):  # type: ignore
 
     __tablename__ = "iau_shower"
     id = Column(Integer, primary_key=True, autoincrement=False)  # same as IAU number
-    code = Column(String(3), nullable=False)
-    name = Column(String, nullable=False)
+    code = Column(String(3), nullable=False, index=True, unique=True)
+    name = Column(String, nullable=False, index=True, unique=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -85,7 +87,7 @@ class Station(_Base):  # type: ignore
 
     __tablename__ = "station"
     id = Column(Integer, primary_key=True)  # same as station number
-    code = Column(String(255), unique=True, nullable=False)
+    code = Column(String(255), unique=True, nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -108,8 +110,8 @@ class ParticipatingStation(_Base):  # type: ignore
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    meteor_id = Column(String, ForeignKey("meteor.id"), nullable=False)
-    station_id = Column(Integer, ForeignKey("station.id"), nullable=False)
+    meteor_id = Column(String, ForeignKey("meteor.id"), nullable=False, index=True)
+    station_id = Column(Integer, ForeignKey("station.id"), nullable=False, index=True)
 
     meteor = relationship("Meteor", backref="recorded_by_station")
     station = relationship("Station", backref="meteors_recorded")
